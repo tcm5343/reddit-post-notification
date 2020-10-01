@@ -1,6 +1,8 @@
 # RedditPostNotification
 A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria.
 
+A subreddit is queried at most once per second as per Reddit's API rules.
+
 # Plan
 1. if the repo is updated the program should prompt the user to update
 2. all information needed by the program should be stored in config file
