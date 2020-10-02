@@ -6,7 +6,7 @@ A subreddit is queried at most once per second as per Reddit's API rules.
 # How to use
 1. You need a reddit account (free, no email required) to get an application ID and secret in order to connect to the Reddit API (https://www.reddit.com/prefs/apps/)
 2. You will need a slack account, create a workspace, and a webhook to send notifications (https://api.slack.com/messaging/webhooks)
-3. Create a `config.json` file to store the credentials (refer to the config example)
+3. Create a `config.json` file to store the credentials (refer to `example_config.json`)
 4. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 5. Build and run the script
     * clone the repository
