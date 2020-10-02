@@ -1,0 +1,34 @@
+{
+	"reddit":
+	{
+		"clientId": "***",
+		"clientSecret": "***",
+		"userAgent": "default"
+	},
+	
+	"slack":
+	{
+		"webhook-url": "***"
+	},
+	
+	"search":
+	{
+		"subreddit_1": {
+			"filters":[
+				{
+				"keywords": ["New", "SSD"]
+				},
+{
+				"keywords": ["New", "HDD"]
+				}
+			]
+		},
+        "subreddit_2": {
+			"filters":[
+				{
+				"keywords": ["New", "SSD"]
+				}
+			]
+		}
+	}
+}
