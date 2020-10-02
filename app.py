@@ -41,19 +41,22 @@ for subreddit in subredditNames:
 
 while (True):
     for subreddit in subredditNames:
+        mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
         # returns new posts from subreddit
-        subredditObj = reddit.subreddit(subreddit).new(limit = 10);
+        subredditObj = reddit.subreddit(subreddit).new(limit = 5);
         print("** New Call **")
 
         for post in subredditObj:
-            scanned = True
 
-            if ( post.created_utc >= lastSubmissionCreated[str(subreddit)] ):
-                scanned = False;
+            if post.created_utc > mostRecentPostTime:
+                mostRecentPostTime = post.created_utc
 
-            if not post.stickied and not scanned:
+            print(str(subreddit) + ": lastSubmissionTime " + str(lastSubmissionCreated[str(subreddit)]) + "Post created: " + str(post.created_utc))
+
+            if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
                 numberOfFilters = len(config["search"][subreddit]["filters"])
+                print("SDFLKJFDSGLKJ;SDGFL;KJDSGF;LKJDSGF;KJLDGFS;LKJDGFSL;KJDFSGLK;JDSGFLK;JDSGFLK;JDGFS;LKJDSGF")
 
                 for filterIndex in range(numberOfFilters):
                     keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
@@ -62,5 +65,5 @@ while (True):
                         print("found " + post.title)
                         slack.post(text=post.title)
 
-        lastSubmissionCreated[str(subreddit)] = time.time()
+        lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
         time.sleep(2)
