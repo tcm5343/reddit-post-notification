@@ -24,7 +24,7 @@ If this program works and saves you some money, consider supporting me by buying
 
 # Todo
 1. if the repo is updated the program should prompt the user to update
-2. output the matches to a log file
+2. add more functionality/options to config file
 3. create thorough documentation and video when core functionality is complete
 4. Add error messages and test
 
