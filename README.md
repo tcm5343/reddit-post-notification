@@ -11,6 +11,7 @@ A subreddit is queried at most once per second as per Reddit's API rules.
 5. Build and run the script
     * clone the repository
     * `cd RedditPostNotification`
+    * `pip install praw`
     * `python3 app.py`
 
 # Todo
