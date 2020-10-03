@@ -24,3 +24,5 @@ A subreddit is queried at most once per second as per Reddit's API rules.
 1. Reddit account (free and doesn't require email)
 2. Slack account (free)
 3. Python v3.6+
+
+![Image of Usage](https://i.imgur.com/2OkJes4.png)
