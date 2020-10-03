@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import datetime, praw, json, time, requests
-from slack_webhook import Slack
 
 def importConfig():
     global config

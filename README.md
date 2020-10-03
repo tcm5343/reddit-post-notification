@@ -11,7 +11,6 @@ A subreddit is queried at most once per second as per Reddit's API rules.
 5. Build and run the script
     * clone the repository
     * `cd RedditPostNotification`
-    * `pip3 install slack-webhook` (https://pypi.org/project/slack-webhook/)
     * `python3 app.py`
 
 # Todo
