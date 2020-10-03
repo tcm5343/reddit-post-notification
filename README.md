@@ -25,4 +25,5 @@ A subreddit is queried at most once per second as per Reddit's API rules.
 2. Slack account (free)
 3. Python v3.6+
 
+# Resource Usage
 ![Image of Usage](https://i.imgur.com/2OkJes4.png)
