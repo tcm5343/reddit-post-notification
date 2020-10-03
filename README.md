@@ -8,15 +8,15 @@ A program which will alert a user of of posts which are made in a specific subre
 4. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 5. Build and run the script
    * Windows
-       1. `git clone https://github.com/tcm5343/RedditPostNotification.git`
-       2. `cd RedditPostNotification`
-       3. `pip install praw`
-       4. `python app.py`
+       * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+       * `cd RedditPostNotification`
+       * `pip install praw`
+       * `python app.py`
    * Linux (Mint)
-       1. `git clone https://github.com/tcm5343/RedditPostNotification.git`
-       2. `cd RedditPostNotification`
-       3. `pip3 install praw`
-       4. `python3 app.py`
+       * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+       * `cd RedditPostNotification`
+       * `pip3 install praw`
+       * `python3 app.py`
 
 # Todo
 1. if the repo is updated the program should prompt the user to update
