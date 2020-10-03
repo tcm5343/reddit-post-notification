@@ -89,7 +89,7 @@ while (True):
                     keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
 
                     if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
-                        print("Found: " + post.title)
+                        outputToLog(post)
                         postToSlack(post)
                         
         lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
