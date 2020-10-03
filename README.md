@@ -7,7 +7,7 @@ A program which will alert a user of of posts which are made in a specific subre
 3. Create a `config.json` file to store the credentials (refer to `example_config.json`)
 4. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 5. Build and run the script
-    * clone the repository
+    * `git clone https://github.com/tcm5343/RedditPostNotification.git`
     * `cd RedditPostNotification`
     * `pip install praw`
     * `python3 app.py`
