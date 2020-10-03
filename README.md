@@ -1,7 +1,5 @@
 # RedditPostNotification
-A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria.
-
-A subreddit is queried at most once per second as per Reddit's API rules.
+A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria. Depending on how many subreddits you are checking, a subreddit is queried at most once per second as per Reddit's API rules.
 
 # How to use
 1. You need a reddit account (free, no email required) to get an application ID and secret in order to connect to the Reddit API (https://www.reddit.com/prefs/apps/)
