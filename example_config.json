@@ -23,7 +23,7 @@
 				}
 			]
 		},
-        "subreddit_2": {
+       		"subreddit_2": {
 			"filters":[
 				{
 				"keywords": ["New", "SSD"]
