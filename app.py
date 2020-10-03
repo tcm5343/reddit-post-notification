@@ -1,18 +1,32 @@
 #!/usr/bin/python3
 
-import datetime, praw, json, time
+import datetime, praw, json, time, requests
 from slack_webhook import Slack
-
-def checkPosts():
-    for post in subreddit:
-        if not post.stickied:
-            print(post.title + " " + str(post.created_utc));
 
 def importConfig():
     global config
     file = open("config.json")
     config = json.load(file)
     file.close()
+
+def postToSlack(post):
+    message = {
+        "blocks": [
+	        {
+		        "type": "section",
+		        "text": {
+			        "type": "mrkdwn",
+			        "text": "<" + post.url + "|" + post.title + ">"
+		        }
+	        }
+        ]
+    }
+
+    response = requests.post(
+        webhookUrl, data=json.dumps(message),
+        headers={'Content-Type': 'application/json'}
+    )
+
 
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
@@ -24,7 +38,7 @@ def stringContainsEveryElementInList(keywordList, string):
   
 importConfig() # reads from config.json   
 
-slack = Slack(url = config["slack"]["webhook-url"]) # access to slack webhook
+webhookUrl = str(config["slack"]["webhook-url"])
 
 # access to reddit api
 reddit = praw.Reddit(client_id = config["reddit"]["clientId"], 
@@ -45,25 +59,21 @@ while (True):
 
         # returns new posts from subreddit
         subredditObj = reddit.subreddit(subreddit).new(limit = 5);
-        print("** New Call **")
 
         for post in subredditObj:
 
             if post.created_utc > mostRecentPostTime:
                 mostRecentPostTime = post.created_utc
 
-            print(str(subreddit) + ": lastSubmissionTime " + str(lastSubmissionCreated[str(subreddit)]) + "Post created: " + str(post.created_utc))
-
             if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
                 numberOfFilters = len(config["search"][subreddit]["filters"])
-                print("SDFLKJFDSGLKJ;SDGFL;KJDSGF;LKJDSGF;KJLDGFS;LKJDGFSL;KJDFSGLK;JDSGFLK;JDSGFLK;JDGFS;LKJDSGF")
 
                 for filterIndex in range(numberOfFilters):
                     keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
 
                     if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
-                        print("found " + post.title)
-                        slack.post(text=post.title)
-
+                        print("Found: " + post.title)
+                        postToSlack(post)
+                        
         lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
-        time.sleep(2)
+        time.sleep(1)
