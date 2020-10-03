@@ -19,7 +19,7 @@ If this program works and saves you some money, consider supporting me by buying
    * Linux (Mint)
        * `git clone https://github.com/tcm5343/RedditPostNotification.git`
        * `cd RedditPostNotification`
-       * `pip3 install praw`
+       * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
        * `python3 app.py`
 
 # Todo

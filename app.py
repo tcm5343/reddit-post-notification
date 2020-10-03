@@ -26,6 +26,25 @@ def postToSlack(post):
         headers={'Content-Type': 'application/json'}
     )
 
+# writes the found post to both the console and log
+def outputToLog(post):
+    now = datetime.datetime.now()
+    
+    date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
+    time = ""
+
+    if now.hour > 12:
+        time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
+    else:
+        time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
+
+    message = date + " " + time + " - " + post.subreddit.name + " - " + post.title
+    
+    f = open("log.log", "a")
+    f.write(message)
+    f.close()
+    
+    print(message)
 
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
@@ -36,7 +55,6 @@ def stringContainsEveryElementInList(keywordList, string):
 
   
 importConfig() # reads from config.json   
-
 webhookUrl = str(config["slack"]["webhook-url"])
 
 # access to reddit api
