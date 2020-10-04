@@ -8,6 +8,23 @@ def importConfig():
     config = json.load(file)
     file.close()
 
+# creates string to be output to the log and console    
+def createOutput(post, subreddit):
+    now = datetime.datetime.now()
+    
+    date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
+    time = ""
+
+    if now.hour > 12:
+        time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
+    else:
+        time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
+
+    message = date + " " + time + " - " + subreddit + " - " + post.title
+    
+    return message
+
+
 def postToSlack(post):
     message = {
         "blocks": [
@@ -27,24 +44,10 @@ def postToSlack(post):
     )
 
 # writes the found post to both the console and log
-def outputToLog(post):
-    now = datetime.datetime.now()
-    
-    date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
-    time = ""
-
-    if now.hour > 12:
-        time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
-    else:
-        time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
-
-    message = date + " " + time + " - " + post.subreddit.name + " - " + post.title
-    
+def outputToLog(message, url):
     f = open("log.log", "a")
-    f.write(message + " (" + post.url + ")")
+    f.write(message + " (" + url + ")\n")
     f.close()
-    
-    print(message)
 
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
@@ -72,25 +75,32 @@ for subreddit in subredditNames:
 
 while (True):
     for subreddit in subredditNames:
-        mostRecentPostTime = 0 # stores most recent post time of this batch of posts
+        try:
+            mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
-        # returns new posts from subreddit
-        subredditObj = reddit.subreddit(subreddit).new(limit = 5);
+            # returns new posts from subreddit
+            subredditObj = reddit.subreddit(subreddit).new(limit = 5);
+            #print("call to subreddit " + subreddit)
+            for post in subredditObj:
 
-        for post in subredditObj:
+                if post.created_utc > mostRecentPostTime:
+                    mostRecentPostTime = post.created_utc
 
-            if post.created_utc > mostRecentPostTime:
-                mostRecentPostTime = post.created_utc
+                if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
+                    numberOfFilters = len(config["search"][subreddit]["filters"])
 
-            if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
-                numberOfFilters = len(config["search"][subreddit]["filters"])
+                    for filterIndex in range(numberOfFilters):
+                        keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
 
-                for filterIndex in range(numberOfFilters):
-                    keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
-
-                    if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
-                        outputToLog(post)
-                        postToSlack(post)
-                        
-        lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
-        time.sleep(1)
+                        if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
+                            message = createOutput(post, subreddit) 
+                            
+                            outputToLog(message, post.url) # writes to log file
+                            postToSlack(post) # sends notification to slack
+                            print(message) # shows notification in the console
+                            
+            lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
+            time.sleep(1.1)
+        except Exception as e:
+            print(e)
+            time.sleep(5)
