@@ -40,7 +40,7 @@ def postToSlack(post):
         headers={'Content-Type': 'application/json'}
     )
 
-# writes the found post to both the console and log
+# writes found post to the log.log file
 def outputToLog(message, url):
     f = open("log.log", "a")
     f.write(message + " (" + url + ")\n")
