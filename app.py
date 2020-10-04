@@ -11,7 +11,6 @@ def importConfig():
 # creates string to be output to the log and console    
 def createOutput(post, subreddit):
     now = datetime.datetime.now()
-    
     date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
     time = ""
 
@@ -21,9 +20,7 @@ def createOutput(post, subreddit):
         time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
 
     message = date + " " + time + " - " + subreddit + " - " + post.title
-    
     return message
-
 
 def postToSlack(post):
     message = {
