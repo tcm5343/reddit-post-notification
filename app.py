@@ -41,7 +41,7 @@ def outputToLog(post):
     message = date + " " + time + " - " + post.subreddit.name + " - " + post.title
     
     f = open("log.log", "a")
-    f.write(message)
+    f.write(message + " (" + post.url + ")")
     f.close()
     
     print(message)
