@@ -27,6 +27,7 @@ If this program works and saves you some money, consider supporting me by buying
 2. add more functionality/options to config file
 3. create thorough documentation and video when core functionality is complete
 4. Add error messages and test
+5. search not only the title but also the content of the post
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
