@@ -91,10 +91,9 @@ while (True):
 
                         if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
                             message = createOutput(post, subreddit) 
-                            
+                            print(message) # shows notification in the console
                             outputToLog(message, post.url) # writes to log file
                             postToSlack(post) # sends notification to slack
-                            print(message) # shows notification in the console
                             
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
