@@ -29,7 +29,7 @@ def postToSlack(post):
 		        "type": "section",
 		        "text": {
 			        "type": "mrkdwn",
-			        "text": "<" + post.url + "|" + post.title + ">"
+			        "text": "<" + post.permalink + "|" + post.title + ">"
 		        }
 	        }
         ]
@@ -92,7 +92,7 @@ while (True):
                         if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
                             message = createOutput(post, subreddit) 
                             print(message) # shows notification in the console
-                            outputToLog(message, post.url) # writes to log file
+                            outputToLog(message, post.permalink) # writes to log file
                             postToSlack(post) # sends notification to slack
                             
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
