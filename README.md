@@ -28,6 +28,8 @@ If this program works and saves you some money, consider supporting me by buying
 3. if the repo is updated the program should prompt the user to update
 4. Add error messages and test
 5. create thorough documentation when core functionality is complete
+6. allow notication do be sent through discord
+7. refactor code (clean up)
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
