@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# moves RedditPostNotification to /bin, where it will be ran upon the start of the raspberry pi
+
+#TODO: add script to path, test, and ship
+
+if [ -d "/bin/RedditPostNotification" ]; # if the directory exists
+then
+	cd /bin/RedditPostNotification # navigate to where script is stored
+	find . -type f ! -name '*.log' -delete # delete every file but the logs
+	sudo cp -r ~/RedditPostNotification/. /bin/RedditPostNotification/ # copies updated script's directories contents into where script resides
+else
+	sudo cp -r ~/RedditPostNotification /bin # copy the directory to /bin 
+fi
