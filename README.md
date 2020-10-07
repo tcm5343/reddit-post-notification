@@ -16,9 +16,10 @@ If this program works and saves you some money, consider supporting me by buying
        * `cd RedditPostNotification`
        * `pip install praw` (https://praw.readthedocs.io/en/latest/)
        * `python app.py`
-   * Linux / Mac OS
+   * Linux
        * `git clone https://github.com/tcm5343/RedditPostNotification.git`
        * `cd RedditPostNotification`
+       * `sudo apt install python-pip`
        * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
        * `python3 app.py`
 
