@@ -8,7 +8,7 @@ def importConfig():
     config = json.load(file)
     file.close()
 
-# creates string to be output to the log and console    
+# creates string to be output to the log and console
 def createOutput(post, subreddit):
     now = datetime.datetime.now()
     date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
@@ -29,7 +29,7 @@ def postToSlack(post):
 		        "type": "section",
 		        "text": {
 			        "type": "mrkdwn",
-			        "text": "<" + post.permalink + "|" + post.title + ">"
+			        "text": "<https://reddit.com" + post.permalink + "|" + post.title + ">"
 		        }
 	        }
         ]
@@ -48,18 +48,18 @@ def outputToLog(message, url):
 
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
-    for keyword in keywordList:           
+    for keyword in keywordList:
         if keyword not in string:
                 inList = False
     return inList
 
-  
-importConfig() # reads from config.json   
+
+importConfig() # reads from config.json
 webhookUrl = str(config["slack"]["webhook-url"])
 
 # access to reddit api
-reddit = praw.Reddit(client_id = config["reddit"]["clientId"], 
-    client_secret = config["reddit"]["clientSecret"], 
+reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
+    client_secret = config["reddit"]["clientSecret"],
     user_agent = config["reddit"]["userAgent"]);
 
 # list holds the names of subreddits to search
@@ -90,13 +90,16 @@ while (True):
                         keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
 
                         if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
-                            message = createOutput(post, subreddit) 
+                            message = createOutput(post, subreddit)
                             print(message) # shows notification in the console
-                            outputToLog(message, post.permalink) # writes to log file
+                            outputToLog(message, "https://reddit.com" + post.permalink) # writes to log file
                             postToSlack(post) # sends notification to slack
-                            
+
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
+        except requests.exceptions.ConnectionError as e:
+            print("Error: Max retries exceeded before connection established, pausing program for 5 secs and continuing")
+            time.sleep(5)
         except Exception as e:
             print(e)
             time.sleep(5)

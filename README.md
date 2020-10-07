@@ -30,6 +30,8 @@ If this program works and saves you some money, consider supporting me by buying
 5. create thorough documentation when core functionality is complete
 6. allow notication do be sent through discord
 7. refactor code (clean up)
+8. write errors to `error.log` instead of printing to screen
+9. give output to user of what the current process is (in the terminal)
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
