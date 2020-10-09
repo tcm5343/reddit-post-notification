@@ -8,20 +8,25 @@ def importConfig():
     config = json.load(file)
     file.close()
 
-# creates string to be output to the log and console
-def createOutput(post, subreddit):
+# returns a time stamp
+def getTimeStamp():
     now = datetime.datetime.now()
     date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
-    time = ""
 
     if now.hour > 12:
         time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
     else:
         time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
 
-    message = date + " " + time + " - " + subreddit + " - " + post.title
+    timeStamp = date + " " + time
+    return timeStamp
+
+# creates string to be output to the log and console
+def createResultOutput(post, subreddit):
+    message = getTimeStamp() + " - " + subreddit + " - " + post.title
     return message
 
+# creates payload and sends post request to slack
 def postToSlack(post):
     message = {
         "blocks": [
@@ -41,9 +46,15 @@ def postToSlack(post):
     )
 
 # writes found post to the log.log file
-def outputToLog(message, url):
+def outputResultToLog(message, url):
     f = open("log.log", "a")
     f.write(message + " (" + url + ")\n")
+    f.close()
+
+# writes found post to the error.log file
+def outputErrorToLog(message, error):
+    f = open("error.log", "a")
+    f.write( getTimeStamp() + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
 def stringContainsEveryElementInList(keywordList, string):
@@ -53,8 +64,19 @@ def stringContainsEveryElementInList(keywordList, string):
                 inList = False
     return inList
 
+try:
+    importConfig() # reads from config.json
+except FileNotFoundError as e:
+    simpleErrorMessage = "Error: config.json is not found, create it based on the example_config.json"
+    print(simpleErrorMessage + "\n" + str(e))
+    outputErrorToLog(simpleErrorMessage, e)
+    quit() # terminates program
+except ValueError as e:
+    simpleErrorMessage = "Error: config.json is not formatted correctly"
+    print(simpleErrorMessage + "\n" + str(e))
+    outputErrorToLog(simpleErrorMessage, e)
+    quit() # terminates program
 
-importConfig() # reads from config.json
 webhookUrl = str(config["slack"]["webhook-url"])
 
 # access to reddit api
@@ -90,9 +112,9 @@ while (True):
                         keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
 
                         if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
-                            message = createOutput(post, subreddit)
+                            message = createResultOutput(post, subreddit)
                             print(message) # shows notification in the console
-                            outputToLog(message, "https://reddit.com" + post.permalink) # writes to log file
+                            outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
                             postToSlack(post) # sends notification to slack
 
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
