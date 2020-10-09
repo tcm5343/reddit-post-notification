@@ -8,7 +8,7 @@ def importConfig():
     config = json.load(file)
     file.close()
 
-# returns a time stamp
+# returns a time stamp for the logs
 def getTimeStamp():
     now = datetime.datetime.now()
     date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
@@ -45,15 +45,16 @@ def postToSlack(post):
         headers={'Content-Type': 'application/json'}
     )
 
-# writes found post to the log.log file
+# writes found post to the results.log file
 def outputResultToLog(message, url):
-    f = open("log.log", "a")
+    f = open("results.log", "a")
     f.write(message + " (" + url + ")\n")
     f.close()
 
-# writes found post to the error.log file
+# writes found post to the errors.log file
 def outputErrorToLog(message, error):
-    f = open("error.log", "a")
+    print(message + "\n" + str(e))
+    f = open("errors.log", "a")
     f.write( getTimeStamp() + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
@@ -68,12 +69,14 @@ try:
     importConfig() # reads from config.json
 except FileNotFoundError as e:
     simpleErrorMessage = "Error: config.json is not found, create it based on the example_config.json"
-    print(simpleErrorMessage + "\n" + str(e))
     outputErrorToLog(simpleErrorMessage, e)
     quit() # terminates program
 except ValueError as e:
     simpleErrorMessage = "Error: config.json is not formatted correctly"
-    print(simpleErrorMessage + "\n" + str(e))
+    outputErrorToLog(simpleErrorMessage, e)
+    quit() # terminates program
+except Exception as e:
+    simpleErrorMessage = "Error: Unhandled exception with regard to importing config"
     outputErrorToLog(simpleErrorMessage, e)
     quit() # terminates program
 
@@ -120,8 +123,11 @@ while (True):
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
         except requests.exceptions.ConnectionError as e:
-            print("Error: Max retries exceeded before connection established, pausing program for 5 secs and continuing")
+            simpleErrorMessage = "Error: Max retries exceeded before connection established, pausing program for 5 secs and continuing"
+            outputErrorToLog(simpleErrorMessage, e)
             time.sleep(5)
         except Exception as e:
-            print(e)
+            simpleErrorMessage = "Error: Unhandled Exception"
+            outputErrorToLog(simpleErrorMessage, e)
             time.sleep(5)
+
