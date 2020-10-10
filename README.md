@@ -41,4 +41,4 @@ If this program works and saves you some money, consider supporting me by buying
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
-![Image of Usage](https://i.imgur.com/2GJvkFo.png)
+![Image of Usage](https://i.imgur.com/Satg3d1.png)
