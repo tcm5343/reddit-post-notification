@@ -29,9 +29,8 @@ If this program works and saves you some money, consider supporting me by buying
 3. if the repo is updated the program should prompt the user to update
 4. Add error messages and test
 5. create thorough documentation when core functionality is complete
-6. allow notication do be sent through discord
 7. refactor code (clean up)
-8. write errors to `error.log` instead of printing to screen
+8. write errors to `errors.log` instead of printing to screen
 9. give output to user of what the current process is (in the terminal)
 
 # Dependencies
