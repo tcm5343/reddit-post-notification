@@ -11,17 +11,23 @@ If this program works and saves you some money, consider supporting me by buying
 3. Create a `config.json` file to store the credentials (refer to `example_config.json`)
 4. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 5. Run the script
-   * Windows
-       * `git clone https://github.com/tcm5343/RedditPostNotification.git`
-       * `cd RedditPostNotification`
-       * `pip install praw` (https://praw.readthedocs.io/en/latest/)
-       * `python app.py`
-   * Linux
-       * `git clone https://github.com/tcm5343/RedditPostNotification.git`
-       * `cd RedditPostNotification`
-       * `sudo apt install python3-pip`
-       * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
-       * `python3 app.py`
+  * Using Docker (Docker must be installed)
+      * Make sure you are in the RedditPostNotification/ directory
+      * `sudo docker build -t "redditpostnotification" ./`
+      * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
+      
+  * Traditionaly
+     * Windows
+         * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+         * `cd RedditPostNotification`
+         * `pip install praw` (https://praw.readthedocs.io/en/latest/)
+         * `python RedditPostNotification.py`
+     * Linux
+         * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+         * `cd RedditPostNotification`
+         * `sudo apt install python3-pip`
+         * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
+         * `python3 RedditPostNotification.py`
 
 # Todo
 1. search not only the title but also the content of the post
