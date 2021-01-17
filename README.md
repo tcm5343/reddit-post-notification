@@ -18,14 +18,14 @@ If this program works and saves you some money, consider supporting me by buying
      * Using Docker (Docker must be installed)
           * `sudo docker build -t "redditpostnotification" ./`
           * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
-  * Traditionaly
-     * Windows
-         * `pip install praw` (https://praw.readthedocs.io/en/latest/)
-         * `python RedditPostNotification.py`
-     * Linux
-         * `sudo apt install python3-pip`
-         * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
-         * `python3 RedditPostNotification.py`
+     * Traditionaly
+          * Windows
+               * `pip install praw` (https://praw.readthedocs.io/en/latest/)
+               * `python RedditPostNotification.py`
+          * Linux
+               * `sudo apt install python3-pip`
+               * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
+               * `python3 RedditPostNotification.py`
 
 # Todo
 1. search not only the title but also the content of the post
