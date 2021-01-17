@@ -28,14 +28,13 @@ If this program works and saves you some money, consider supporting me by buying
                * `python3 RedditPostNotification.py`
 
 # Todo
-1. search not only the title but also the content of the post
-2. add more functionality/options to config file
-3. if the repo is updated the program should prompt the user to update
-4. Add error messages and test
-5. create thorough documentation when core functionality is complete
-7. refactor code (clean up)
-8. write errors to `errors.log` instead of printing to screen
-9. give output to user of what the current process is (in the terminal)
+* search not only the title but also the content of the post
+* add more functionality/options to config file
+* if the repo is updated the program should prompt the user to update
+* Add error messages and test
+* create thorough documentation when core functionality is complete
+* refactor code (clean up)
+* give output to user of what the current process is (in the terminal)
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
