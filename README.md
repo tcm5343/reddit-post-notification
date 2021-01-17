@@ -15,9 +15,9 @@ If this program works and saves you some money, consider supporting me by buying
 4. Create `config.json` to store the credentials (refer to `example_config.json`) and place it in RedditPostNotification/
 5. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 6. Run the script
-  * Using Docker (Docker must be installed)
-      * `sudo docker build -t "redditpostnotification" ./`
-      * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
+     * Using Docker (Docker must be installed)
+          * `sudo docker build -t "redditpostnotification" ./`
+          * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
   * Traditionaly
      * Windows
          * `pip install praw` (https://praw.readthedocs.io/en/latest/)
