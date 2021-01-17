@@ -12,7 +12,9 @@ If this program works and saves you some money, consider supporting me by buying
 4. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 5. Run the script
   * Using Docker (Docker must be installed)
-      * Make sure you are in the RedditPostNotification/ directory
+      * `cd ~`
+      * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+      * `cd RedditPostNotification`
       * `sudo docker build -t "redditpostnotification" ./`
       * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
       
