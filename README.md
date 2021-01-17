@@ -9,9 +9,9 @@ If this program works and saves you some money, consider supporting me by buying
 1. You need a reddit account (free, no email required) to get an application ID and secret in order to connect to the Reddit API (https://www.reddit.com/prefs/apps/)
 2. You will need a slack account, create a workspace, and a webhook to send notifications (https://api.slack.com/messaging/webhooks)
 3. Navigate to your home directory and clone the repo
- * `cd ~`
- * `git clone https://github.com/tcm5343/RedditPostNotification.git`
- * `cd RedditPostNotification`
+      * `cd ~`
+      * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+      * `cd RedditPostNotification`
 4. Create `config.json` to store the credentials (refer to `example_config.json`) and place it in RedditPostNotification/
 5. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
 6. Run the script
