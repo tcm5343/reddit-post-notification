@@ -29,6 +29,7 @@ def createResultOutput(post, subreddit):
 # creates payload and sends post request to slack
 def postToSlack(post):
     message = {
+        "text": post.title,
         "blocks": [
 	        {
 		        "type": "section",
