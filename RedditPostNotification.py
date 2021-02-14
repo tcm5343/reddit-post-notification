@@ -27,7 +27,7 @@ def createResultOutput(post, subreddit):
     return message
 
 # creates payload and sends post request to slack
-def postToSlack(post):
+def postToSlack(users, post):
     message = {
         "text": post.title,
         "blocks": [
@@ -40,6 +40,9 @@ def postToSlack(post):
 	        }
         ]
     }
+
+    if (users != ""):
+        message["blocks"][0]["text"]["text"] = users + message["blocks"][0]["text"]["text"]
 
     response = requests.post(
         webhookUrl, data=json.dumps(message),
@@ -58,6 +61,17 @@ def outputErrorToLog(message, error):
     f = open("errors.log", "a")
     f.write( getTimeStamp() + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
+
+def determineWhoToNotify(filter):
+    result = ""
+
+    if (filter.get("notify")):
+        whoToNotify = list(filter["notify"])
+        
+        for user in whoToNotify:
+            result += "<@" + user + "> "
+
+    return result
 
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
@@ -86,7 +100,7 @@ webhookUrl = str(config["slack"]["webhook-url"])
 # access to reddit api
 reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
     client_secret = config["reddit"]["clientSecret"],
-    user_agent = config["reddit"]["userAgent"]);
+    user_agent = config["reddit"]["userAgent"])
 
 # list holds the names of subreddits to search
 subredditNames = list(config["search"].keys())
@@ -102,7 +116,7 @@ while (True):
             mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
             # returns new posts from subreddit
-            subredditObj = reddit.subreddit(subreddit).new(limit = 5);
+            subredditObj = reddit.subreddit(subreddit).new(limit = 5)
             #print("call to subreddit " + subreddit)
             for post in subredditObj:
 
@@ -119,7 +133,7 @@ while (True):
                             message = createResultOutput(post, subreddit)
                             print(message) # shows notification in the console
                             outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
-                            postToSlack(post) # sends notification to slack
+                            postToSlack(determineWhoToNotify(config["search"][subreddit]["filters"][filterIndex]), post) # sends notification to slack
 
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
