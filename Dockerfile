@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 COPY RedditPostNotification.py .
 COPY config.json .
 
+RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip3 install praw
 
 CMD [ "python", "./RedditPostNotification.py" ]
