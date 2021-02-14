@@ -19,7 +19,8 @@
 				"keywords": ["New", "SSD"]
 				},
                 		{
-				"keywords": ["New", "HDD"]
+				"keywords": ["New", "HDD"],
+				"notify": ["U01BZV31H1S"]
 				}
 			]
 		},
