@@ -41,9 +41,11 @@ def postToSlack(users, post):
         ]
     }
 
+    # adds users to be notified of post to message
     if (users != ""):
         message["blocks"][0]["text"]["text"] = users + message["blocks"][0]["text"]["text"]
 
+    # sends message to slack
     response = requests.post(
         webhookUrl, data=json.dumps(message),
         headers={'Content-Type': 'application/json'}
@@ -62,6 +64,7 @@ def outputErrorToLog(message, error):
     f.write( getTimeStamp() + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
+# reads the config to determine who to notify for the specfic filter
 def determineWhoToNotify(filter):
     result = ""
 
@@ -73,6 +76,7 @@ def determineWhoToNotify(filter):
 
     return result
 
+# determines if the reddit post title contains every word in the filter list
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
     for keyword in keywordList:
@@ -117,7 +121,7 @@ while (True):
 
             # returns new posts from subreddit
             subredditObj = reddit.subreddit(subreddit).new(limit = 5)
-            #print("call to subreddit " + subreddit)
+            
             for post in subredditObj:
 
                 if post.created_utc > mostRecentPostTime:
