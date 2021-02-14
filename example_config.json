@@ -1,4 +1,10 @@
 {
+	"__users__":
+	{
+		"jack": " ",
+		"jill": " "
+	},
+
 	"reddit":
 	{
 		"clientId": "***",
