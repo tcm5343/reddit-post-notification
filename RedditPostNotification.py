@@ -145,6 +145,10 @@ while (True):
             simpleErrorMessage = "Error: Max retries exceeded before connection established, pausing program for 5 secs and continuing"
             outputErrorToLog(simpleErrorMessage, e)
             time.sleep(5)
+        except requests.exceptions.HTTPError as e:
+            simpleErrorMessage = ""
+            outputErrorToLog(simpleErrorMessage, e)
+            time.sleep(5)
         except Exception as e:
             simpleErrorMessage = "Error: Unhandled Exception"
             outputErrorToLog(simpleErrorMessage, e)
