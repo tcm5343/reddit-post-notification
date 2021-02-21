@@ -27,7 +27,7 @@ If this program works and saves you some money, consider supporting me by buying
                * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
                * `python3 RedditPostNotification.py`
 
-# How to build `config.json`
+# How to build config.json
 Building the config...
 
 # Todo
