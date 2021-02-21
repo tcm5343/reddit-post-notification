@@ -27,14 +27,13 @@ If this program works and saves you some money, consider supporting me by buying
                * `pip3 install praw` (https://praw.readthedocs.io/en/latest/)
                * `python3 RedditPostNotification.py`
 
+# How to build `config.json`
+Building the config...
+
 # Todo
 * search not only the title but also the content of the post
-* add more functionality/options to config file
 * if the repo is updated the program should prompt the user to update
-* Add error messages and test
-* create thorough documentation when core functionality is complete
 * refactor code (clean up)
-* give output to user of what the current process is (in the terminal)
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
