@@ -76,12 +76,20 @@ def determineWhoToNotify(filter):
 
     return result
 
-# determines if the reddit post title contains every word in the filter list
+# determines if a string contains every word in a list of strings
 def stringContainsEveryElementInList(keywordList, string):
     inList = True # default
     for keyword in keywordList:
         if keyword not in string:
                 inList = False
+    return inList
+
+# determines if a string contains at least one word in a list of strings
+def stringContainsAnElementInList(keywordList, string):
+    inList = False # default
+    for keyword in keywordList:
+        if keyword in string:
+                return True
     return inList
 
 try:
@@ -131,13 +139,25 @@ while (True):
                     numberOfFilters = len(config["search"][subreddit]["filters"])
 
                     for filterIndex in range(numberOfFilters):
-                        keywordFilter = list([x.lower() for x in config["search"][subreddit]["filters"][filterIndex]["keywords"]])
+                        # default flag intiliazations
+                        exceptFlag = True
+                        includesFlag = False
+                        
+                        filter = config["search"][subreddit]["filters"][filterIndex]
 
-                        if stringContainsEveryElementInList(keywordFilter, post.title.lower()):
+                        if (filter.get("includes")):
+                            includesFilter = list([x.lower() for x in filter["includes"]])
+                            includesFlag = stringContainsEveryElementInList(includesFilter, post.title.lower())
+
+                        if (filter.get("except")):
+                            exceptFilter = list([x.lower() for x in filter["except"]])
+                            exceptFlag = stringContainsAnElementInList(exceptFilter, post.title.lower())
+
+                        if includesFlag and not exceptFlag:
                             message = createResultOutput(post, subreddit)
                             print(message) # shows notification in the console
                             outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
-                            postToSlack(determineWhoToNotify(config["search"][subreddit]["filters"][filterIndex]), post) # sends notification to slack
+                            postToSlack(determineWhoToNotify(filter), post) # sends notification to slack
 
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
@@ -153,4 +173,3 @@ while (True):
             simpleErrorMessage = "Error: Unhandled Exception"
             outputErrorToLog(simpleErrorMessage, e)
             time.sleep(5)
-
