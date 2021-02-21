@@ -22,10 +22,11 @@
 		"subreddit_1": {
 			"filters":[
 				{
-				"keywords": ["New", "SSD"]
+				"includes": ["New", "SSD"],
+				"except": ["CA"]
 				},
                 		{
-				"keywords": ["New", "HDD"],
+				"includes": ["New", "HDD"],
 				"notify": ["U01BZV31H1S"]
 				}
 			]
@@ -33,7 +34,7 @@
        		"subreddit_2": {
 			"filters":[
 				{
-				"keywords": ["New", "SSD"]
+				"includes": ["New", "SSD"]
 				}
 			]
 		}
