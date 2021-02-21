@@ -132,9 +132,12 @@ while (True):
             
             for post in subredditObj:
 
+                # updates the time of the most recently filtered post
                 if post.created_utc > mostRecentPostTime:
                     mostRecentPostTime = post.created_utc
 
+                # checks the time the post was created vs the most recent logged time to ensure
+                # posts are not filtered multiple times
                 if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
                     numberOfFilters = len(config["search"][subreddit]["filters"])
 
