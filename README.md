@@ -43,4 +43,4 @@ Building the config...
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
-![Image of Usage](https://i.imgur.com/Satg3d1.png)
+![Image of Usage](https://i.imgur.com/1MKmEzK.png)
