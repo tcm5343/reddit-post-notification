@@ -30,11 +30,6 @@ If this program works and saves you some money, consider supporting me by buying
 # How to build the config file
 Building the config...
 
-# Todo
-* search not only the title but also the content of the post
-* if the repo is updated the program should prompt the user to update
-* refactor code (clean up)
-
 # Dependencies
 1. Reddit account (free and doesn't require email)
 2. Slack account (free)
@@ -44,3 +39,8 @@ Building the config...
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
 ![Image of Usage](https://i.imgur.com/1MKmEzK.png)
+
+# Todo
+* search not only the title but also the content of the post
+* if the repo is updated the program should prompt the user to update
+* refactor code (clean up)
