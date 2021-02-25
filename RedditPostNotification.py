@@ -151,10 +151,14 @@ while (True):
                         if (filter.get("includes")):
                             includesFilter = list([x.lower() for x in filter["includes"]])
                             includesFlag = stringContainsEveryElementInList(includesFilter, post.title.lower())
+                        else: 
+                            includesFlag = True
 
                         if (filter.get("except")):
                             exceptFilter = list([x.lower() for x in filter["except"]])
                             exceptFlag = stringContainsAnElementInList(exceptFilter, post.title.lower())
+                        else:
+                            exceptFlag = False
 
                         if includesFlag and not exceptFlag:
                             message = createResultOutput(post, subreddit)
