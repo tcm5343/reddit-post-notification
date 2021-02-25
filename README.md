@@ -1,7 +1,7 @@
 # RedditPostNotification
 A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria. Depending on how many subreddits you are checking, a subreddit is queried at most once per second as per Reddit's API rules.
 
-If this program works and saves you some money, consider supporting me by buying me a coffee:
+If this program works and saves you some money or time, consider sending me some BTC at `bc1qmqnmr8hwj2lcp2ccfg95k0378urfxtm80k7fu0` or my PayPal below. 
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WN85PYVLLLSKL&currency_code=USD)
 
@@ -30,11 +30,6 @@ If this program works and saves you some money, consider supporting me by buying
 # How to build the config file
 Building the config...
 
-# Todo
-* search not only the title but also the content of the post
-* if the repo is updated the program should prompt the user to update
-* refactor code (clean up)
-
 # Dependencies
 1. Reddit account (free and doesn't require email)
 2. Slack account (free)
@@ -43,4 +38,4 @@ Building the config...
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
-![Image of Usage](https://i.imgur.com/Satg3d1.png)
+![Image of Usage](https://i.imgur.com/1MKmEzK.png)
