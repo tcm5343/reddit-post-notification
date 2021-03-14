@@ -1,40 +1,52 @@
 {
-	"__users__":
-	{
+	"__users__": {
 		"jack": " ",
 		"jill": " "
 	},
-
-	"reddit":
-	{
+	"reddit": {
 		"clientId": "***",
 		"clientSecret": "***",
 		"userAgent": "default"
 	},
-	
-	"slack":
-	{
-		"webhook-url": "***"
+	"notifications": {
+		"app": "***",
+		"telegram": {
+			"token": "***"
+		},
+		"slack": {
+			"webhook-url": "***"
+		}
 	},
-	
-	"search":
-	{
+	"search": {
 		"subreddit_1": {
-			"filters":[
+			"filters": [
 				{
-				"includes": ["New", "SSD"],
-				"except": ["CA"]
+					"includes": [
+						"New",
+						"SSD"
+					],
+					"except": [
+						"CA"
+					]
 				},
-                		{
-				"includes": ["New", "HDD"],
-				"notify": ["U01BZV31H1S"]
+				{
+					"includes": [
+						"New",
+						"HDD"
+					],
+					"notify": [
+						"U01BZV31H1S"
+					]
 				}
 			]
 		},
-       		"subreddit_2": {
-			"filters":[
+		"subreddit_2": {
+			"filters": [
 				{
-				"includes": ["New", "SSD"]
+					"includes": [
+						"New",
+						"SSD"
+					]
 				}
 			]
 		}
