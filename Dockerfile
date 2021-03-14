@@ -1,3 +1,4 @@
+
 FROM python:3
 
 ENV TZ=America/New_York
@@ -11,4 +12,4 @@ COPY config.json .
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip3 install praw
 
-CMD [ "python", "./RedditPostNotification.py" ]
+CMD [ "python3", "RedditPostNotification.py" ]
