@@ -3,10 +3,23 @@
 import datetime, praw, json, time, requests
 
 def importConfig():
-    global config
-    file = open("config.json")
-    config = json.load(file)
-    file.close()
+    try:
+        global config
+        file = open("config.json")
+        config = json.load(file)
+        file.close()
+    except FileNotFoundError as e:
+        simpleErrorMessage = "Error: config.json is not found, create it based on the example_config.json"
+        outputErrorToLog(simpleErrorMessage, e)
+        quit() # terminates program
+    except ValueError as e:
+        simpleErrorMessage = "Error: config.json is not formatted correctly"
+        outputErrorToLog(simpleErrorMessage, e)
+        quit() # terminates program
+    except Exception as e:
+        simpleErrorMessage = "Error: Unhandled exception with regard to importing config"
+        outputErrorToLog(simpleErrorMessage, e)
+        quit() # terminates program
 
 # returns a time stamp for the logs
 def getTimeStamp():
@@ -27,29 +40,46 @@ def createResultOutput(post, subreddit):
     return message
 
 # creates payload and sends post request to slack
-def postToSlack(users, post):
-    message = {
-        "text": post.title,
-        "blocks": [
-	        {
-		        "type": "section",
-		        "text": {
-			        "type": "mrkdwn",
-			        "text": "<https://reddit.com" + post.permalink + "|" + post.title + ">"
-		        }
-	        }
-        ]
-    }
+def sendNotification(users, post, notification_app):
+    if notification_app == "slack":
+        formatted_users = ""
+        for index, user in enumerate(users):
+            formatted_users += "<@" + str(users[index]) + "> "
 
-    # adds users to be notified of post to message
-    if (users != ""):
-        message["blocks"][0]["text"]["text"] = users + message["blocks"][0]["text"]["text"]
+        api_url = str(config["notifications"]["slack"]["webhook-url"])
+        message = {
+            "text": post.title,
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<https://reddit.com" + post.permalink + "|" + post.title + ">"
+                    }
+                }
+            ]
+        }
 
-    # sends message to slack
-    response = requests.post(
-        webhookUrl, data=json.dumps(message),
-        headers={'Content-Type': 'application/json'}
-    )
+        # adds users to be notified of post to message
+        if (formatted_users != ""):
+            message["blocks"][0]["text"]["text"] = formatted_users + message["blocks"][0]["text"]["text"]
+
+        # sends message to slack
+        response = requests.post(
+            api_url, data=json.dumps(message),
+            headers={'Content-Type': 'application/json'}
+        )
+    elif notification_app == "telegram":
+        for user in users:
+            api_url = f'https://api.telegram.org/bot{ str(config["notifications"]["telegram"]["token"]) }/sendMessage'
+
+            message = f'<a href="https://reddit.com{post.permalink}">{post.title}</a>'
+
+            # Create json link with message
+            data = {'chat_id': user, 'text': message, 'parse_mode': 'HTML'}
+
+            # POST the message
+            requests.post(api_url, data)
 
 # writes found post to the results.log file
 def outputResultToLog(message, url):
@@ -66,13 +96,11 @@ def outputErrorToLog(message, error):
 
 # reads the config to determine who to notify for the specfic filter
 def determineWhoToNotify(filter):
-    result = ""
+    result = []    
 
     if (filter.get("notify")):
-        whoToNotify = list(filter["notify"])
-        
-        for user in whoToNotify:
-            result += "<@" + user + "> "
+        for user in list(filter["notify"]):
+            result.append(user)
 
     return result
 
@@ -92,22 +120,10 @@ def stringContainsAnElementInList(keywordList, string):
                 return True
     return inList
 
-try:
-    importConfig() # reads from config.json
-except FileNotFoundError as e:
-    simpleErrorMessage = "Error: config.json is not found, create it based on the example_config.json"
-    outputErrorToLog(simpleErrorMessage, e)
-    quit() # terminates program
-except ValueError as e:
-    simpleErrorMessage = "Error: config.json is not formatted correctly"
-    outputErrorToLog(simpleErrorMessage, e)
-    quit() # terminates program
-except Exception as e:
-    simpleErrorMessage = "Error: Unhandled exception with regard to importing config"
-    outputErrorToLog(simpleErrorMessage, e)
-    quit() # terminates program
+importConfig() # reads from config.json
 
-webhookUrl = str(config["slack"]["webhook-url"])
+# determine which notification app to use
+notification_app = str(config["notifications"]["app"])
 
 # access to reddit api
 reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
@@ -164,7 +180,7 @@ while (True):
                             message = createResultOutput(post, subreddit)
                             print(message) # shows notification in the console
                             outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
-                            postToSlack(determineWhoToNotify(filter), post) # sends notification to slack
+                            sendNotification(determineWhoToNotify(filter), post, notification_app) # sends notification to slack
 
             lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
             time.sleep(1.1)
