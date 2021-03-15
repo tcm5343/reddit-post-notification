@@ -32,7 +32,7 @@ Building the config...
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
-2. Slack account (free)
+2. Slack or Telegram Application
 3. Python v3.6+
 
 # Resource Usage
