@@ -10,8 +10,9 @@ If this program works and saves you some money or time, consider sending me some
 2. You will a messaging app in order to be notified of the posts. If a messaging app you would like to use is not listed here, feel free to make a pull request. Please adhere as close as you can to the current layout of the config and program structure.
       * Telegram (recommended because it is easier to setup and doesn't use Google services to push notifications on Android)
           * update the config to use telegram as the notification app
-          * add @redditbot_app (https://t.me/redditapp_bot) and start a conversation, this is the bot that will send you notifications
-          * add @userinfobot (https://t.me/userinfobot) and start a conversation to find your account id (must be included in the config on each filter that you want to be notified about)
+          * create a bot using the BotFather (https://t.me/botfather)
+          * add the token of your new bot (example token: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`) to the config
+          * in Telegram, add @userinfobot (https://t.me/userinfobot) and start a conversation to find your account id (must be included in the config on each filter that you want to be notified about)
       * Slack
           * update the config to use slack as the notification app
           * create a workspace, and a webhook in that workspace to send notifications (https://api.slack.com/messaging/webhooks)
