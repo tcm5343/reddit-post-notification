@@ -7,14 +7,22 @@ If this program works and saves you some money or time, consider sending me some
 
 # How to use
 1. You need a reddit account (free, no email required) to get an application ID and secret in order to connect to the Reddit API (https://www.reddit.com/prefs/apps/)
-2. You will need a slack account, create a workspace, and a webhook to send notifications (https://api.slack.com/messaging/webhooks)
-3. Navigate to your home directory and clone the repo
+2. You will a messaging app in order to be notified of the posts. If a messaging app you would like to use is not listed here, feel free to make a pull request. Please adhere as close as you can to the current layout of the config and program structure.
+      * Telegram (recommended because it is easier to setup and doesn't use Google services to push notifications on Android)
+          * update the config to use telegram as the notification app
+          * add @redditbot_app (https://t.me/redditapp_bot) and start a conversation, this is the bot that will send you notifications
+          * add @userinfobot (https://t.me/userinfobot) and start a conversation to find your account id (must be included in the config on each filter that you want to be notified about)
+      * Slack
+          * update the config to use slack as the notification app
+          * create a workspace, and a webhook in that workspace to send notifications (https://api.slack.com/messaging/webhooks)
+          * if you want to be mentioned in the notification, add your slack id in the filters you would like to be mentioned in
+4. Navigate to your home directory and clone the repo
       * `cd ~`
       * `git clone https://github.com/tcm5343/RedditPostNotification.git`
       * `cd RedditPostNotification`
-4. Create `config.json` to store the credentials (refer to `example_config.json`) and place it in RedditPostNotification/
-5. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
-6. Run the script
+5. Create `config.json` to store the credentials (refer to `example_config.json`) and place it in RedditPostNotification/
+6. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
+7. Run the script
      * Using Docker (Docker must be installed)
           * `sudo docker build -t "redditpostnotification" ./`
           * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
@@ -32,7 +40,7 @@ Building the config...
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
-2. Slack account (free)
+2. Notification App (Slack or Telegram)
 3. Python v3.6+
 
 # Resource Usage
