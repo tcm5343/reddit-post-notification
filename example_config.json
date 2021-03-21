@@ -5,8 +5,7 @@
 	},
 	"reddit": {
 		"clientId": "***",
-		"clientSecret": "***",
-		"userAgent": "default"
+		"clientSecret": "***"
 	},
 	"notifications": {
 		"app": "***",
