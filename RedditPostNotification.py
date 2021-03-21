@@ -128,7 +128,7 @@ notification_app = str(config["notifications"]["app"])
 # access to reddit api
 reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
     client_secret = config["reddit"]["clientSecret"],
-    user_agent = config["reddit"]["userAgent"])
+    user_agent = "default")
 
 # list holds the names of subreddits to search
 subredditNames = list(config["search"].keys())
