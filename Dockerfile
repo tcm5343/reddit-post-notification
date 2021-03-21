@@ -1,4 +1,3 @@
-
 FROM python:3
 
 ENV TZ=America/New_York
