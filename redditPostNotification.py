@@ -39,7 +39,7 @@ def createResultOutput(post, subreddit):
     message = getTimeStamp() + " - " + subreddit + " - " + post.title
     return message
 
-# creates payload and sends post request to slack
+# creates payload and sends post request to the notification app
 def sendNotification(users, post, notification_app):
     if notification_app == "slack":
         formatted_users = ""
