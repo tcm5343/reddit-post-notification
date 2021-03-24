@@ -2,6 +2,8 @@ import pytest, datetime
 import redditPostNotification as r
 from types import SimpleNamespace
 
+# to run the tests, simply type `pytest` in the directory
+
 @pytest.mark.parametrize("keyword_list, test_string, expected_result", [
     (["tHis","string"], "This is a string", True),
     ([""], "This is a string", True),
@@ -48,4 +50,3 @@ def test_createResultOutput(post, subreddit):
     ])
 def test_getTimeStamp(time, expected_result):
     assert r.getTimeStamp(time) == expected_result
-    
