@@ -95,95 +95,97 @@ def outputErrorToLog(message, error):
     f.close()
 
 # reads the config to determine who to notify for the specfic filter
-def determineWhoToNotify(filter):
+def determineWhoToNotify(filter) -> list:
     result = []    
-
     if (filter.get("notify")):
         for user in list(filter["notify"]):
             result.append(user)
-
     return result
 
 # determines if a string contains every word in a list of strings
-def stringContainsEveryElementInList(keywordList, string):
+# not case-sensitive
+def stringContainsEveryElementInList(keywordList, string) -> bool:
     inList = True # default
-    for keyword in keywordList:
-        if keyword not in string:
+    for keyword in list([x.lower() for x in keywordList]):
+        if keyword not in string.lower():
                 inList = False
     return inList
 
 # determines if a string contains at least one word in a list of strings
-def stringContainsAnElementInList(keywordList, string):
+# not case-sensitive
+def stringContainsAnElementInList(keywordList, string) -> bool:
     inList = False # default
-    for keyword in keywordList:
-        if keyword in string:
+    for keyword in list([x.lower() for x in keywordList]):
+        if keyword in string.lower():
                 return True
     return inList
 
-importConfig() # reads from config.json
+def main():
+    importConfig() # reads from config.json
 
-# determine which notification app to use
-notification_app = str(config["notifications"]["app"])
+    # determine which notification app to use
+    notification_app = str(config["notifications"]["app"])
 
-# access to reddit api
-reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
-    client_secret = config["reddit"]["clientSecret"],
-    user_agent = "default")
+    # access to reddit api
+    reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
+        client_secret = config["reddit"]["clientSecret"],
+        user_agent = "default")
 
-# list holds the names of subreddits to search
-subredditNames = list(config["search"].keys())
+    # list holds the names of subreddits to search
+    subredditNames = list(config["search"].keys())
 
-# stores the time the last submission checked was created in unix time per subreddit
-lastSubmissionCreated = {}
-for subreddit in subredditNames:
-    lastSubmissionCreated[str(subreddit)] = time.time()
-
-while (True):
+    # stores the time the last submission checked was created in unix time per subreddit
+    lastSubmissionCreated = {}
     for subreddit in subredditNames:
-        try:
-            mostRecentPostTime = 0 # stores most recent post time of this batch of posts
+        lastSubmissionCreated[str(subreddit)] = time.time()
 
-            # returns new posts from subreddit
-            subredditObj = reddit.subreddit(subreddit).new(limit = 5)
-            
-            for post in subredditObj:
+    while (True):
+        for subreddit in subredditNames:
+            try:
+                mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
-                # updates the time of the most recently filtered post
-                if post.created_utc > mostRecentPostTime:
-                    mostRecentPostTime = post.created_utc
+                # returns new posts from subreddit
+                subredditObj = reddit.subreddit(subreddit).new(limit = 5)
+                
+                for post in subredditObj:
 
-                # checks the time the post was created vs the most recent logged time to ensure
-                # posts are not filtered multiple times
-                if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
-                    numberOfFilters = len(config["search"][subreddit]["filters"])
+                    # updates the time of the most recently filtered post
+                    if post.created_utc > mostRecentPostTime:
+                        mostRecentPostTime = post.created_utc
 
-                    for filterIndex in range(numberOfFilters):
-                        # default flag intiliazations
-                        exceptFlag = True
-                        includesFlag = False
-                        
-                        filter = config["search"][subreddit]["filters"][filterIndex]
+                    # checks the time the post was created vs the most recent logged time to ensure
+                    # posts are not filtered multiple times
+                    if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
+                        numberOfFilters = len(config["search"][subreddit]["filters"])
 
-                        if (filter.get("includes")):
-                            includesFilter = list([x.lower() for x in filter["includes"]])
-                            includesFlag = stringContainsEveryElementInList(includesFilter, post.title.lower())
-                        else: 
-                            includesFlag = True
+                        for filterIndex in range(numberOfFilters):
+                            # default flag intiliazations
+                            exceptFlag = True
+                            includesFlag = False
+                            
+                            filter = config["search"][subreddit]["filters"][filterIndex]
 
-                        if (filter.get("except")):
-                            exceptFilter = list([x.lower() for x in filter["except"]])
-                            exceptFlag = stringContainsAnElementInList(exceptFilter, post.title.lower())
-                        else:
-                            exceptFlag = False
+                            if (filter.get("includes")):
+                                includesFlag = stringContainsEveryElementInList(filter["includes"], post.title)
+                            else: 
+                                includesFlag = True
 
-                        if includesFlag and not exceptFlag:
-                            message = createResultOutput(post, subreddit)
-                            print(message) # shows notification in the console
-                            outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
-                            sendNotification(determineWhoToNotify(filter), post, notification_app) # sends notification to slack
+                            if (filter.get("except")):
+                                exceptFlag = stringContainsAnElementInList(filter["except"], post.title)
+                            else:
+                                exceptFlag = False
 
-            lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
-            time.sleep(1.1)
-        except Exception as e:
-            outputErrorToLog(" ", e)
-            time.sleep(5)
+                            if includesFlag and not exceptFlag:
+                                message = createResultOutput(post, subreddit)
+                                print(message) # shows notification in the console
+                                outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
+                                sendNotification(determineWhoToNotify(filter), post, notification_app) # sends notification to slack
+
+                lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
+                time.sleep(1.1)
+            except Exception as e:
+                outputErrorToLog(" ", e)
+                time.sleep(5)
+
+if __name__ == "__main__":
+    main()
