@@ -22,12 +22,15 @@ def importConfig():
         quit() # terminates program
 
 # returns a time stamp for the logs
-def getTimeStamp():
-    now = datetime.datetime.now()
+def getTimeStamp(now) -> str:
     date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
 
-    if now.hour > 12:
+    if now.hour == 11:
+        time = "12" + ":" + str(now.minute).zfill(2) + " PM"
+    elif now.hour > 11:
         time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
+    elif now.hour == 0:
+        time = "12" + ":" + str(now.minute).zfill(2) + " AM"
     else:
         time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
 
@@ -35,8 +38,8 @@ def getTimeStamp():
     return timeStamp
 
 # creates string to be output to the log and console
-def createResultOutput(post, subreddit):
-    message = getTimeStamp() + " - " + subreddit + " - " + post.title
+def createResultOutput(post, subreddit) -> str:
+    message = getTimeStamp(datetime.datetime.now()) + " - " + subreddit + " - " + post.title
     return message
 
 # creates payload and sends post request to the notification app
@@ -91,7 +94,7 @@ def outputResultToLog(message, url):
 def outputErrorToLog(message, error):
     print(message + "\n" + str(e))
     f = open("errors.log", "a")
-    f.write( getTimeStamp() + ": " + message + "\n" + str(error) + "\n\n")
+    f.write( getTimeStamp(datetime.datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
 # reads the config to determine who to notify for the specfic filter
