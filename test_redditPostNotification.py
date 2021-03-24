@@ -54,4 +54,5 @@ def test_getTimeStamp(time, expected_result):
     ])
 def test_createResultOutput(post, subreddit, expected_result, getTimeStamp):
     p = SimpleNamespace(**post)
-    assert r.createResultOutput(p, subreddit) == getTimeStamp + expected_result
+    expected_result = getTimeStamp + expected_result
+    assert r.createResultOutput(p, subreddit) == expected_result
