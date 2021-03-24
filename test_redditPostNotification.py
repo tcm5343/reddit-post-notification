@@ -43,10 +43,11 @@ def test_createResultOutput(post, subreddit):
     assert r.createResultOutput(p, subreddit) == r.getTimeStamp(datetime.datetime.now()) + " - " + subreddit + " - " + p.title
 
 @pytest.mark.parametrize("time, expected_result", [
-    ( datetime.datetime(2020, 3, 11, 14, 0, 0), "3-11-2020 2:00 PM"),
+    ( datetime.datetime(2020, 3, 11, 13, 0, 0), "3-11-2020 1:00 PM"),
     ( datetime.datetime(1999, 7, 11, 0, 0, 0), "7-11-1999 12:00 AM"),
     ( datetime.datetime(2020, 3, 11, 11, 0, 0), "3-11-2020 12:00 PM"),
-    ( datetime.datetime(2020, 3, 11, 23, 0, 0), "3-11-2020 11:00 PM")
+    ( datetime.datetime(2020, 3, 11, 23, 0, 0), "3-11-2020 11:00 PM"),
+    ( datetime.datetime(2020, 3, 16, 7, 0, 0), "3-16-2020 7:00 AM")
     ])
 def test_getTimeStamp(time, expected_result):
     assert r.getTimeStamp(time) == expected_result
