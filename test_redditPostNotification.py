@@ -5,7 +5,8 @@ import redditPostNotification as r
     (["tHis","string"], "This is a string", True),
     ([""], "This is a string", True),
     (["this","string"], "", False),
-    (["i"], "This is a string", True)
+    (["i"], "This is a string", True),
+    ([], "This is a string", False)
     ])
 def test_stringContainsAnElementInList(keyword_list, test_string, expected_result):
     result = r.stringContainsAnElementInList(keyword_list, test_string)
@@ -15,7 +16,8 @@ def test_stringContainsAnElementInList(keyword_list, test_string, expected_resul
     (["tHis","string"], "This is a string", True),
     ([""], "This is a string", True),
     (["this","string"], "", False),
-    (["This","not"], "This is a string", False)
+    (["This","not"], "This is a string", False),
+    ([], "This is a string", False)
     ])
 def test_stringContainsEveryElementInList(keyword_list, test_string, expected_result):
     result = r.stringContainsEveryElementInList(keyword_list, test_string)
@@ -24,7 +26,8 @@ def test_stringContainsEveryElementInList(keyword_list, test_string, expected_re
 @pytest.mark.parametrize("filter, expected_result", [
     ({"notify": ["1580989241"]}, ["1580989241"]),
     ({"includes": ["wts"]},[]),
-    ({"notify": ["1580989241","345234523"]}, ["1580989241","345234523"])
+    ({"notify": ["1580989241","345234523"]}, ["1580989241","345234523"]),
+    ({"notify": []}, [])
     ])
 def test_determineWhoToNotify(filter, expected_result):
     result = r.determineWhoToNotify(filter)
