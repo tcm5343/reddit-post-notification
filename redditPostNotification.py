@@ -106,9 +106,12 @@ def determineWhoToNotify(filter) -> list:
 # not case-sensitive
 def stringContainsEveryElementInList(keywordList, string) -> bool:
     inList = True # default
-    for keyword in list([x.lower() for x in keywordList]):
-        if keyword not in string.lower():
-                inList = False
+    if not keywordList: # if list is empty
+        inList = False
+    else: # list is not empty
+        for keyword in list([x.lower() for x in keywordList]):
+            if keyword not in string.lower():
+                    inList = False
     return inList
 
 # determines if a string contains at least one word in a list of strings
