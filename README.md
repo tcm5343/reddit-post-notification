@@ -37,7 +37,7 @@ If this program works and saves you some money or time, consider sending me some
                * `python3 RedditPostNotification.py`
 
 # How to build the config file
-TODO: Add instructions
+TODO: Add instructions on building config
 
 # Dependencies
 1. Reddit account (free and doesn't require email)
