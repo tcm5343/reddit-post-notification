@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import datetime, praw, json, time, requests
+import datetime, praw, json, time, requests, sqlite3
 
 def importConfig() -> None:
     try:
@@ -20,6 +20,22 @@ def importConfig() -> None:
         simpleErrorMessage = "Error: Unhandled exception with regard to importing config"
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
+
+# creates a sqlite3 database
+def createDatabase():
+    con = sqlite3.connect('results.db')
+    cur = con.cursor()
+
+    # Create table
+    cur.execute('''CREATE TABLE if not exists results (
+        id integer not null primary key,
+        date_time text,
+        subreddit text,
+        post_title text,
+        post_url text)''')
+
+    con.commit()
+    con.close()
 
 # returns a time stamp for the logs
 def getTimeStamp(now) -> str:
