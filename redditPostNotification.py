@@ -21,11 +21,20 @@ def importConfig() -> None:
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
 
-# creates a sqlite3 database
-def createDatabase():
+# connect to database
+def connectToDatabase():
+    global con, cur
     con = sqlite3.connect('results.db')
     cur = con.cursor()
 
+# closes the connection to the database
+def closeDatabase():
+    con.commit()
+    con.close()
+
+# creates a sqlite3 database
+def createDatabase():
+    connectToDatabase()
     # Create table
     cur.execute('''CREATE TABLE if not exists results (
         id integer not null primary key,
@@ -34,8 +43,14 @@ def createDatabase():
         post_title text,
         post_url text)''')
 
-    con.commit()
-    con.close()
+    closeDatabase()
+
+# writes results to sqlite3 database
+def outputResultToDatabase(subreddit, post):
+    connectToDatabase()
+    # create record to store in the database
+    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.datetime.now(), subreddit, post.title, "https://reddit.com" + post.permalink))
+    closeDatabase()
 
 # returns a time stamp for the logs
 def getTimeStamp(now) -> str:
@@ -143,7 +158,8 @@ def stringContainsAnElementInList(keywordList, string) -> bool:
     return inList
 
 def main() -> None:
-    importConfig() # reads from config.json
+    importConfig() # read from config.json
+    createDatabase() # create the db
 
     # determine which notification app to use
     notification_app = str(config["notifications"]["app"])
@@ -156,7 +172,7 @@ def main() -> None:
     # list holds the names of subreddits to search
     subredditNames = list(config["search"].keys())
 
-    # stores the time the last submission checked was created in unix time per subreddit
+    # store the time the last submission checked was created in unix time per subreddit
     lastSubmissionCreated = {}
     for subreddit in subredditNames:
         lastSubmissionCreated[str(subreddit)] = time.time()
@@ -197,11 +213,13 @@ def main() -> None:
                             else:
                                 exceptFlag = False
 
+                            # if condition passes, a result has been found
                             if includesFlag and not exceptFlag:
                                 message = createResultOutput(post, subreddit)
-                                print(message) # shows notification in the console
+                                outputResultToDatabase(subreddit, post)
                                 outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
                                 sendNotification(determineWhoToNotify(filter), post, notification_app) # sends notification to slack
+                                print(message) # shows notification in the console
 
                 lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
                 time.sleep(1.1)
