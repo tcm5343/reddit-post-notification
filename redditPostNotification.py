@@ -2,7 +2,7 @@
 
 import datetime, praw, json, time, requests
 
-def importConfig():
+def importConfig() -> None:
     try:
         global config
         file = open("config.json")
@@ -43,7 +43,7 @@ def createResultOutput(post, subreddit) -> str:
     return message
 
 # creates payload and sends post request to the notification app
-def sendNotification(users, post, notification_app):
+def sendNotification(users, post, notification_app) -> None:
     if notification_app == "slack":
         formatted_users = ""
         for index, user in enumerate(users):
@@ -85,13 +85,13 @@ def sendNotification(users, post, notification_app):
             requests.post(api_url, data)
 
 # writes found post to the results.log file
-def outputResultToLog(message, url):
+def outputResultToLog(message, url) -> None:
     f = open("results.log", "a")
     f.write(message + " (" + url + ")\n")
     f.close()
 
 # writes found post to the errors.log file
-def outputErrorToLog(message, error):
+def outputErrorToLog(message, error) -> None:
     print(message + "\n" + str(e))
     f = open("errors.log", "a")
     f.write( getTimeStamp(datetime.datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
@@ -126,7 +126,7 @@ def stringContainsAnElementInList(keywordList, string) -> bool:
                 return True
     return inList
 
-def main():
+def main() -> None:
     importConfig() # reads from config.json
 
     # determine which notification app to use
