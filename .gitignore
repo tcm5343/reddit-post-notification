@@ -1,5 +1,6 @@
 config.json
-*.log
+config_test.json
 __pycache__/test_redditPostNotification.cpython-39-pytest-6.2.2.pyc
 __pycache__/redditPostNotification.cpython-39.pyc
 *.db
+*.log
