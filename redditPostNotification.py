@@ -128,7 +128,7 @@ def outputErrorToLog(message, error=None) -> None:
     f.write( getTimeStamp(datetime.datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
-# reads the config to determine who to notify for the specfic filter
+# reads a filter to determine who to notify
 def determineWhoToNotify(filter) -> list:
     result = []    
     if (filter.get("notify")):
