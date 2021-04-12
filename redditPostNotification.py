@@ -184,7 +184,13 @@ def filter_post(post, subreddit, filter, q):
     r["notify"] = result
     q.put(r)
 
-    return result
+
+def post_found(post, subreddit, who_to_notify) -> None:
+    message = createResultOutput(post, subreddit)
+    outputResultToDatabase(subreddit, post)
+    outputResultToLog(message, post.permalink) # writes to log file
+    sendNotification(who_to_notify, post, notification_app) # sends notification to slack
+    print(message) # shows notification in the console
 
 def main() -> None:
     importConfig() # read from config.json
@@ -259,11 +265,7 @@ def main() -> None:
                             return_vals["who_to_notify"].update( set(ret["who_to_notify"]) )
 
                     if return_vals["notify"] == True:
-                        message = createResultOutput(post, subreddit)
-                        outputResultToDatabase(subreddit, post)
-                        outputResultToLog(message, post.permalink) # writes to log file
-                        sendNotification(list(return_vals["who_to_notify"]), post, notification_app) # sends notification to slack
-                        print(message) # shows notification in the console
+                        post_found(post, subreddit, list(return_vals["who_to_notify"]))
 
                     num = time.time() - start
                     times_list.append(num)
