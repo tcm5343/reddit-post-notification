@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import datetime, praw, json, time, requests, sqlite3, multiprocessing, queue, copy
+import datetime, praw, json, time, requests, sqlite3, multiprocessing, copy
 
 def importConfig() -> None:
     try:
