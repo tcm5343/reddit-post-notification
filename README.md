@@ -39,6 +39,26 @@ If this program works and saves you some money or time, consider sending me some
 # How to build the config file
 TODO: Add instructions on building config
 
+`"__users__"`: Only used as a comment to store the user id's of the users of the program. This field is never accessed by the program.
+
+`"reddit"`
+- `"clientId"`
+- `"clientSecret"`
+
+`"notifications"`
+- `"app"`: String which tells the program which notification app you are using. (only valid values are `slack` or `telegram`)
+- `"telegram"`
+     - `"token"`
+- `"slack"`
+     - `"webhook-url"`
+
+`"search"`
+
+`"filters"`
+- `"includes"`: Array of substrings that are all required to be in the post for a notification to be sent.
+- `"except"`: Array of substrings that if any are in the post title, the notification will not be sent.
+- `"notify"`: Array of strings containing the user id's for a notification to be sent to. (optional for Slack)
+
 # Dependencies
 1. Reddit account (free and doesn't require email)
 2. Notification App (Slack or Telegram)
