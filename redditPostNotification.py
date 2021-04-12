@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
-import datetime, praw, json, time, requests, sqlite3
+import datetime, praw, json, time, requests, sqlite3, multiprocessing, queue, copy
 
 def importConfig() -> None:
     try:
         global config
-        file = open("config.json")
+        file = open("config_test.json")
         config = json.load(file)
         file.close()
     except FileNotFoundError as e:
@@ -49,7 +49,7 @@ def createDatabase():
 def outputResultToDatabase(subreddit, post):
     connectToDatabase()
     # create record to store in the database
-    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.datetime.now(), subreddit, post.title, "https://reddit.com" + post.permalink))
+    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.datetime.now(), subreddit, post.title, post.permalink))
     closeDatabase()
 
 # returns a time stamp for the logs
@@ -122,8 +122,8 @@ def outputResultToLog(message, url) -> None:
     f.close()
 
 # writes found post to the errors.log file
-def outputErrorToLog(message, error) -> None:
-    print(message + "\n" + str(e))
+def outputErrorToLog(message, error=None) -> None:
+    print(message + "\n" + str(error))
     f = open("errors.log", "a")
     f.write( getTimeStamp(datetime.datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
@@ -157,11 +157,41 @@ def stringContainsAnElementInList(keywordList, string) -> bool:
                 return True
     return inList
 
+
+def filter_post(post, subreddit, filter, q):
+    # default flag intiliazations
+    result = False
+    exceptFlag = True
+    includesFlag = False
+
+    if (filter.get("includes")):
+        includesFlag = stringContainsEveryElementInList(filter["includes"], post.title)
+    else: 
+        includesFlag = True
+
+    if (filter.get("except")):
+        exceptFlag = stringContainsAnElementInList(filter["except"], post.title)
+    else:
+        exceptFlag = False
+
+    r = q.get()
+
+    # if condition passes, a result has been found
+    if includesFlag and not exceptFlag:
+        result = True
+        r["who_to_notify"] = determineWhoToNotify(filter)
+
+    r["notify"] = result
+    q.put(r)
+
+    return result
+
 def main() -> None:
     importConfig() # read from config.json
     createDatabase() # create the db
 
     # determine which notification app to use
+    global notification_app
     notification_app = str(config["notifications"]["app"])
 
     # access to reddit api
@@ -177,56 +207,87 @@ def main() -> None:
     for subreddit in subredditNames:
         lastSubmissionCreated[str(subreddit)] = time.time()
 
+    times_list = []
+
     while (True):
         for subreddit in subredditNames:
-            try:
-                mostRecentPostTime = 0 # stores most recent post time of this batch of posts
+            mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
-                # returns new posts from subreddit
-                subredditObj = reddit.subreddit(subreddit).new(limit = 5)
-                
-                for post in subredditObj:
+            # returns new posts from subreddit
+            subredditObj = reddit.subreddit(subreddit).new(limit = 5)
+            
+            for post in subredditObj:
 
-                    # updates the time of the most recently filtered post
-                    if post.created_utc > mostRecentPostTime:
-                        mostRecentPostTime = post.created_utc
+                # updates the time of the most recently filtered post
+                if post.created_utc > mostRecentPostTime:
+                    mostRecentPostTime = post.created_utc
 
-                    # checks the time the post was created vs the most recent logged time to ensure
-                    # posts are not filtered multiple times
-                    if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
-                        numberOfFilters = len(config["search"][subreddit]["filters"])
+                # checks the time the post was created vs the most recent logged time to ensure
+                # posts are not filtered multiple times
+                if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
+                    start = time.time()
 
-                        for filterIndex in range(numberOfFilters):
-                            # default flag intiliazations
-                            exceptFlag = True
-                            includesFlag = False
-                            
-                            filter = config["search"][subreddit]["filters"][filterIndex]
+                    numberOfFilters = len(config["search"][subreddit]["filters"])
+                    queue = multiprocessing.Queue()
 
-                            if (filter.get("includes")):
-                                includesFlag = stringContainsEveryElementInList(filter["includes"], post.title)
-                            else: 
-                                includesFlag = True
+                    processes = []
+                    return_vals = {
+                            "notify": False,
+                            "who_to_notify": set()
+                        }
+                    
+                    # creates and starts a process for applying each filter for a subreddit on a post
+                    for filterIndex in range(numberOfFilters):
+                        ret = copy.deepcopy(return_vals)
+                        queue.put(ret)
 
-                            if (filter.get("except")):
-                                exceptFlag = stringContainsAnElementInList(filter["except"], post.title)
-                            else:
-                                exceptFlag = False
+                        p = multiprocessing.Process( 
+                            target=filter_post, 
+                            args=(post, subreddit, config["search"][subreddit]["filters"][filterIndex], queue)
+                        )
+                        
+                        processes.append(p)
+                        processes[filterIndex].start()               
 
-                            # if condition passes, a result has been found
-                            if includesFlag and not exceptFlag:
-                                message = createResultOutput(post, subreddit)
-                                outputResultToDatabase(subreddit, post)
-                                outputResultToLog(message, "https://reddit.com" + post.permalink) # writes to log file
-                                sendNotification(determineWhoToNotify(filter), post, notification_app) # sends notification to slack
-                                print(message) # shows notification in the console
+                    # when a process is finished, a record is pulled off the queue and processed
+                    for p in processes:
+                        p.join()
+                        ret = queue.get() # will block
 
-                lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
-                time.sleep(1.1)
-            except Exception as e:
-                outputErrorToLog(" ", e)
-                time.sleep(5)
+                        if ret["notify"] == True:
+                            return_vals["notify"] = True
+                            return_vals["who_to_notify"].update( set(ret["who_to_notify"]) )
+
+                    if return_vals["notify"] == True:
+                        message = createResultOutput(post, subreddit)
+                        outputResultToDatabase(subreddit, post)
+                        outputResultToLog(message, post.permalink) # writes to log file
+                        sendNotification(list(return_vals["who_to_notify"]), post, notification_app) # sends notification to slack
+                        print(message) # shows notification in the console
+
+                    num = time.time() - start
+                    times_list.append(num)
+                    
+                    sum = 0
+                    for n in times_list:
+                        sum = sum + n
+                        
+                    print("time to apply all", subreddit, "filters to the post:", num, "seconds")
+                    print("new average time:", sum / len(times_list))
+                    print(" ")
+
+            lastSubmissionCreated[str(subreddit)] = mostRecentPostTime
+            time.sleep(1.1)
+
 
 if __name__ == "__main__":
-    main()
-    
+    try:
+        main()
+    except sqlite3.Error as e:
+        outputErrorToLog(" ", e)
+        time.sleep(5)
+        main()
+    except Exception as e:
+        outputErrorToLog(" ", e)
+        time.sleep(5)
+        main()
