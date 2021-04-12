@@ -45,8 +45,8 @@ TODO: Add instructions on building config
 3. Python v3.6+
 
 # FAQ
-#### If a post triggers multiple filters in a subreddit, will I be notifed correctly?
-Yes, all filters within a subreddit are processed against a post at the same time using multiprocessing. If your name is on one or more of the filters which would trigger a notification being sent, you will recieve only one notification. 
+#### **If a post triggers multiple filters in a subreddit, notifications be sent correctly?**
+Yes, all filters within a subreddit are processed against a post title at the same time using multiprocessing. If whomever is set to be notified is on one or more of the filters which would trigger a notification, they will recieve one notification for the post. 
 
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
