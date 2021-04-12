@@ -47,4 +47,4 @@ TODO: Add instructions on building config
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
-![Image of Usage](https://i.imgur.com/1MKmEzK.png)
+![Image of Usage](https://i.ibb.co/VxJVVtC/Screen-Shot-2021-04-11-at-9-50-08-PM.png)
