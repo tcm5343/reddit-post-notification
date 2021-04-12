@@ -5,7 +5,7 @@ import datetime, praw, json, time, requests, sqlite3, multiprocessing, copy
 def importConfig() -> None:
     try:
         global config
-        file = open("config_test.json")
+        file = open("config.json")
         config = json.load(file)
         file.close()
     except FileNotFoundError as e:
