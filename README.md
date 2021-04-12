@@ -44,6 +44,10 @@ TODO: Add instructions on building config
 2. Notification App (Slack or Telegram)
 3. Python v3.6+
 
+# FAQ
+#### If a post triggers multiple filters in a subreddit, will I be notifed correctly?
+Yes, all filters within a subreddit are processed against a post at the same time using multiprocessing. If your name is on one or more of the filters which would trigger a notification being sent, you will recieve only one notification. 
+
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
 
