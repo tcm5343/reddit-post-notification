@@ -46,7 +46,7 @@ TODO: Add instructions on building config
 - `"clientSecret"`
 
 `"notifications"`
-- `"app"`: String which tells the program which notification app you are using. (only valid values are `slack` or `telegram`)
+- `"app"`: String which tells the program which notification app you are using. (only valid values are "slack" or "telegram")
 - `"telegram"`
      - `"token"`
 - `"slack"`
