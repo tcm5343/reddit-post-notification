@@ -1,19 +1,25 @@
 #!/usr/bin/python3
 
-import datetime, praw, json, time, requests, sqlite3, multiprocessing, copy
+import datetime, json, time, requests, multiprocessing, copy
 
-def importConfig() -> None:
+import praw, sqlite3
+
+# if True, disables writing results to the db, the notification being sent, and uses config_test.json
+debugging = True
+
+def importConfig() -> dict:
+    config_file_name = "config.json" if not debugging else "config_test.json"
     try:
-        global config
-        file = open("config.json")
+        file = open(config_file_name)
         config = json.load(file)
         file.close()
+        return config
     except FileNotFoundError as e:
-        simpleErrorMessage = "Error: config.json is not found, create it based on the example_config.json"
+        simpleErrorMessage = f"Error: {config_file_name} is not found, create it based on the example_config.json"
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
     except ValueError as e:
-        simpleErrorMessage = "Error: config.json is not formatted correctly"
+        simpleErrorMessage = f"Error: {config_file_name} is not formatted correctly"
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
     except Exception as e:
@@ -22,18 +28,18 @@ def importConfig() -> None:
         quit() # terminates program
 
 # connect to database
-def connectToDatabase():
+def connectToDatabase() -> None:
     global con, cur
     con = sqlite3.connect('results.db')
     cur = con.cursor()
 
 # closes the connection to the database
-def closeDatabase():
+def closeDatabase() -> None:
     con.commit()
     con.close()
 
 # creates a sqlite3 database
-def createDatabase():
+def createDatabase() -> None:
     connectToDatabase()
     # Create table
     cur.execute('''CREATE TABLE if not exists results (
@@ -48,7 +54,6 @@ def createDatabase():
 # writes results to sqlite3 database
 def outputResultToDatabase(subreddit, post):
     connectToDatabase()
-    # create record to store in the database
     cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.datetime.now(), subreddit, post.title, post.permalink))
     closeDatabase()
 
@@ -187,18 +192,21 @@ def filter_post(post, subreddit, filter, q):
 
 def post_found(post, subreddit, who_to_notify) -> None:
     message = createResultOutput(post, subreddit)
-    outputResultToDatabase(subreddit, post)
-    outputResultToLog(message, post.permalink) # writes to log file
-    sendNotification(who_to_notify, post, notification_app) # sends notification to slack
     print(message) # shows notification in the console
 
-def main() -> None:
-    importConfig() # read from config.json
-    createDatabase() # create the db
+    if not debugging:
+        sendNotification(who_to_notify, post, notification_app) # sends notification to slack
+        outputResultToDatabase(subreddit, post)
+        outputResultToLog(message, post.permalink) # writes to log file
 
-    # determine which notification app to use
-    global notification_app
+
+def main() -> None:
+    global config, notification_app
+
+    config = importConfig()
     notification_app = str(config["notifications"]["app"])
+
+    createDatabase()
 
     # access to reddit api
     reddit = praw.Reddit(client_id = config["reddit"]["clientId"],
@@ -233,8 +241,12 @@ def main() -> None:
                 if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
                     start = time.time()
 
+                    print("post found")
+
                     numberOfFilters = len(config["search"][subreddit]["filters"])
                     queue = multiprocessing.Queue()
+
+                    print("nuber of filters processed:", numberOfFilters)
 
                     processes = []
                     return_vals = {
