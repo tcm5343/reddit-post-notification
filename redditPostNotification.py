@@ -1,8 +1,13 @@
 #!/usr/bin/python3
 
-import datetime, json, time, requests, multiprocessing, copy
+import time, multiprocessing
+from json import load, dumps
+from sqlite3 import connect, Error
+from copy import deepcopy
+from requests import post
+from datetime import datetime
 
-import praw, sqlite3
+import praw
 
 # if True, disables writing results to the db, the notification being sent, and uses config_test.json
 debugging = True
@@ -11,7 +16,7 @@ def importConfig() -> dict:
     config_file_name = "config.json" if not debugging else "config_test.json"
     try:
         file = open(config_file_name)
-        config = json.load(file)
+        config = load(file)
         file.close()
         return config
     except FileNotFoundError as e:
@@ -30,7 +35,7 @@ def importConfig() -> dict:
 # connect to database
 def connectToDatabase() -> None:
     global con, cur
-    con = sqlite3.connect('results.db')
+    con = connect('results.db')
     cur = con.cursor()
 
 # closes the connection to the database
@@ -54,7 +59,7 @@ def createDatabase() -> None:
 # writes results to sqlite3 database
 def outputResultToDatabase(subreddit, post):
     connectToDatabase()
-    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.datetime.now(), subreddit, post.title, post.permalink))
+    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.now(), subreddit, post.title, post.permalink))
     closeDatabase()
 
 # returns a time stamp for the logs
@@ -75,7 +80,7 @@ def getTimeStamp(now) -> str:
 
 # creates string to be output to the log and console
 def createResultOutput(post, subreddit) -> str:
-    message = getTimeStamp(datetime.datetime.now()) + " - " + subreddit + " - " + post.title
+    message = getTimeStamp(datetime.now()) + " - " + subreddit + " - " + post.title
     return message
 
 # creates payload and sends post request to the notification app
@@ -104,8 +109,8 @@ def sendNotification(users, post, notification_app) -> None:
             message["blocks"][0]["text"]["text"] = formatted_users + message["blocks"][0]["text"]["text"]
 
         # sends message to slack
-        response = requests.post(
-            api_url, data=json.dumps(message),
+        response = post(
+            api_url, data=dumps(message),
             headers={'Content-Type': 'application/json'}
         )
     elif notification_app == "telegram":
@@ -118,7 +123,7 @@ def sendNotification(users, post, notification_app) -> None:
             data = {'chat_id': user, 'text': message, 'parse_mode': 'HTML'}
 
             # POST the message
-            requests.post(api_url, data)
+            post(api_url, data)
 
 # writes found post to the results.log file
 def outputResultToLog(message, url) -> None:
@@ -130,7 +135,7 @@ def outputResultToLog(message, url) -> None:
 def outputErrorToLog(message, error=None) -> None:
     print(message + "\n" + str(error))
     f = open("errors.log", "a")
-    f.write( getTimeStamp(datetime.datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
+    f.write( getTimeStamp(datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
 # reads a filter to determine who to notify
@@ -256,7 +261,7 @@ def main() -> None:
                     
                     # creates and starts a process for applying each filter for a subreddit on a post
                     for filterIndex in range(numberOfFilters):
-                        ret = copy.deepcopy(return_vals)
+                        ret = deepcopy(return_vals)
                         queue.put(ret)
 
                         p = multiprocessing.Process( 
@@ -297,7 +302,7 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except sqlite3.Error as e:
+    except Error as e: # sqlite3 error
         outputErrorToLog(" ", e)
         time.sleep(5)
         main()
