@@ -64,19 +64,7 @@ def outputResultToDatabase(subreddit, post):
 
 # returns a time stamp for the logs
 def getTimeStamp(now) -> str:
-    date = str(now.month) + "-" + str(now.day) + "-" + str(now.year)
-
-    if now.hour == 11:
-        time = "12" + ":" + str(now.minute).zfill(2) + " PM"
-    elif now.hour > 11:
-        time = str(now.hour - 12) + ":" + str(now.minute).zfill(2) + " PM"
-    elif now.hour == 0:
-        time = "12" + ":" + str(now.minute).zfill(2) + " AM"
-    else:
-        time = str(now.hour) + ":" + str(now.minute).zfill(2) + " AM"
-
-    timeStamp = date + " " + time
-    return timeStamp
+    return now.strftime("%m-%d-%Y %I:%M:%S %p")
 
 # creates string to be output to the log and console
 def createResultOutput(post, subreddit) -> str:
