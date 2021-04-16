@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 
-import requests
-import time
-import sqlite3
+from threading import Thread
+from multiprocessing import Queue
 
-from multiprocessing import Queue, Process
 from json import load, dumps
 from copy import deepcopy
 from datetime import datetime
 from sys import exit
+
+import time
+import sqlite3
+import requests
 
 import praw
 
@@ -16,7 +18,7 @@ import praw
 # - disables writing results to the db
 # - disables the notification being sent
 # - uses config_test.json
-DEBUGGING = False
+DEBUGGING = True
 
 CONFIG, NOTIFICATION_APP, CON, CUR = None, None, None, None
 
@@ -43,14 +45,12 @@ def import_config():
         exit()
 
 
-# connect to database
 def connect_to_database():
     global CON, CUR
     CON = sqlite3.connect('results.db')
     CUR = CON.cursor()
 
 
-# closes the connection to the database
 def close_database() -> None:
     CON.commit()
     CON.close()
@@ -232,7 +232,7 @@ def process_post(post, subreddit):
         ret = deepcopy(return_vals)
         queue.put(ret)
 
-        process = Process(
+        process = Thread(
             target=filter_post,
             args=(post, CONFIG["search"][subreddit]["filters"][filter_index], queue)
         )
@@ -273,7 +273,8 @@ def main() -> None:
     for subreddit in subreddit_names:
         last_submission_created[str(subreddit)] = time.time()
 
-    times_list = []
+    number_of_posts = 0
+    total_time = 0
 
     while True:
         for subreddit in subreddit_names:
@@ -292,20 +293,15 @@ def main() -> None:
                 if post.created_utc > last_submission_created[str(subreddit)]:
                     start = time.time()
 
-                    print(post.title)
-
                     last_submission_created[str(subreddit)] = post.created_utc
                     process_post(post, subreddit)
 
-                    num = time.time() - start
-                    times_list.append(num)
+                    total_time += time.time() - start
+                    number_of_posts += 1
 
-                    total_time = 0
-                    for filter_time in times_list:
-                        total_time += filter_time
-
-                    print("time to apply all", subreddit, "filters to the post:", num, "seconds")
-                    print("new average time:", total_time / len(times_list))
+                    # print("time to apply all", subreddit, "filters to the post:", num, "seconds")
+                    print("new average time for", number_of_posts,
+                          "post(s):", total_time / number_of_posts)
                     print(" ")
 
             time.sleep(1.1)
