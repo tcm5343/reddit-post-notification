@@ -1,7 +1,7 @@
 # reddit-post-notification
 A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria. Depending on how many subreddits you are checking, a subreddit is queried at most once per second as per Reddit's API rules.
 
-If this program works and saves you some money or time, consider sending me some BTC at `bc1qmqnmr8hwj2lcp2ccfg95k0378urfxtm80k7fu0` or my PayPal below. 
+If this program works and saves you some money or time, consider sending me some BTC at `bc1qmqnmr8hwj2lcp2ccfg95k0378urfxtm80k7fu0` or my PayPal below.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=WN85PYVLLLSKL&currency_code=USD)
 
@@ -66,7 +66,14 @@ TODO: Add instructions on building config
 
 # FAQ
 ### If a post triggers multiple filters in a subreddit, will notifications be sent correctly?
-- Yes, all filters within a subreddit are processed against a post title at the same time using multiprocessing. If whomever is set to be notified is on one or more of the filters which would trigger a notification, they will recieve one notification for the post. 
+- Yes, all filters within a subreddit are processed against a post title at the same time using multiprocessing. If whomever is set to be notified is on one or more of the filters which would trigger a notification, they will recieve one notification for the post.
+
+# Speed:
+Although this program is not resource heavy, the post processing
+time is correlated to what hardware it is running on. All 100 of the filters
+being applied to a post contain the includes, excludes, and notify sections.
+
+- **4-16-2021** - The average time taken from filtering 250 different posts processing 100 filters on each is 0.283 seconds. 
 
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
