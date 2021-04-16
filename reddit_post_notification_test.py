@@ -1,12 +1,15 @@
-import pytest, datetime
+import pytest
+import datetime
 import reddit_post_notification as r
 from types import SimpleNamespace
 
 # to run the tests, simply type `pytest` in the directory
 
+
 @pytest.fixture
-def getTimeStamp() -> str:
-    return r.getTimeStamp(datetime.datetime.now())
+def get_time_stamp() -> str:
+    return r.get_time_stamp(datetime.datetime.now())
+
 
 @pytest.mark.parametrize("keyword_list, test_string, expected_result", [
     (["tHis","string"], "This is a string", True),
@@ -15,8 +18,9 @@ def getTimeStamp() -> str:
     (["i"], "This is a string", True),
     ([], "This is a string", False)
     ])
-def test_stringContainsAnElementInList(keyword_list, test_string, expected_result):
-    assert r.stringContainsAnElementInList(keyword_list, test_string) == expected_result
+def test_string_contains_an_element_in_list(keyword_list, test_string, expected_result):
+    assert r.string_contains_an_element_in_list(keyword_list, test_string) == expected_result
+
 
 @pytest.mark.parametrize("keyword_list, test_string, expected_result", [
     (["tHis","string"], "This is a string", True),
@@ -25,17 +29,19 @@ def test_stringContainsAnElementInList(keyword_list, test_string, expected_resul
     (["This","not"], "This is a string", False),
     ([], "This is a string", False)
     ])
-def test_stringContainsEveryElementInList(keyword_list, test_string, expected_result):
-    assert r.stringContainsEveryElementInList(keyword_list, test_string) == expected_result
+def test_string_contains_every_element_in_list(keyword_list, test_string, expected_result):
+    assert r.string_contains_every_element_in_list(keyword_list, test_string) == expected_result
 
-@pytest.mark.parametrize("filter, expected_result", [
+
+@pytest.mark.parametrize("single_filter, expected_result", [
     ({"notify": ["1580989241"]}, ["1580989241"]),
     ({"includes": ["wts"]},[]),
     ({"notify": ["1580989241","345234523"]}, ["1580989241","345234523"]),
     ({"notify": []}, [])
     ])
-def test_determineWhoToNotify(filter, expected_result):
-    assert r.determineWhoToNotify(filter) == expected_result
+def test_determine_who_to_notify(single_filter, expected_result):
+    assert r.determine_who_to_notify(single_filter) == expected_result
+
 
 @pytest.mark.parametrize("time, expected_result", [
     ( datetime.datetime(2020, 3, 11, 13, 0, 0), "03-11-2020 01:00:00 PM"),
@@ -44,17 +50,16 @@ def test_determineWhoToNotify(filter, expected_result):
     ( datetime.datetime(2020, 3, 11, 23, 0, 0), "03-11-2020 11:00:00 PM"),
     ( datetime.datetime(2020, 3, 9, 7, 1, 0), "03-09-2020 07:01:00 AM")
     ])
-def test_getTimeStamp(time, expected_result):
-    assert r.getTimeStamp(time) == expected_result
+def test_get_time_stamp(time, expected_result):
+    assert r.get_time_stamp(time) == expected_result
+
 
 @pytest.mark.parametrize("post, subreddit, expected_result", [
     ({"title": "[WTS] Guitar"}, "GuitarSwap", " - GuitarSwap - [WTS] Guitar"),
     ({"title": ""}, "GuitarSwap", " - GuitarSwap - "),
     ({"title": "[WTS] Guitar"}, "", " -  - [WTS] Guitar")
     ])
-def test_createResultOutput(post, subreddit, expected_result, getTimeStamp):
+def test_create_result_output(post, subreddit, expected_result, get_time_stamp):
     p = SimpleNamespace(**post)
-    expected_result = getTimeStamp + expected_result
-    assert r.createResultOutput(p, subreddit) == expected_result
-
-
+    expected_result = get_time_stamp + expected_result
+    assert r.create_result_output(p, subreddit) == expected_result
