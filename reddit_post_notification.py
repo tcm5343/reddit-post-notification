@@ -16,7 +16,7 @@ import praw
 # - disables writing results to the db
 # - disables the notification being sent
 # - uses config_test.json
-DEBUGGING = True
+DEBUGGING = False
 
 CONFIG, NOTIFICATION_APP, CON, CUR = None, None, None, None
 
