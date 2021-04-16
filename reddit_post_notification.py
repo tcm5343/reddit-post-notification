@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 
+import requests
 import time
-import sys
 import sqlite3
-import multiprocessing
 
+from multiprocessing import Queue, Process
 from json import load, dumps
 from copy import deepcopy
 from datetime import datetime
+from sys import exit
 
 import praw
 
 # if True
 # - disables writing results to the db
-# - the notification being sent
+# - disables the notification being sent
 # - uses config_test.json
 DEBUGGING = True
 
@@ -31,15 +32,15 @@ def import_config():
         simple_error_message = f"Error: {config_file_name} is not found, \
             create it based on the example_config.json"
         output_error_to_log(simple_error_message, import_error)
-        sys.exit()
+        exit()
     except ValueError as import_error:
         simple_error_message = f"Error: {config_file_name} is not formatted correctly"
         output_error_to_log(simple_error_message, import_error)
-        sys.exit()
+        exit()
     except Exception as import_error:
         simple_error_message = "Error: Unhandled exception with regard to importing config"
         output_error_to_log(simple_error_message, import_error)
-        sys.exit()
+        exit()
 
 
 # connect to database
@@ -114,7 +115,7 @@ def send_notification(users, post) -> None:
                 formatted_users + message["blocks"][0]["text"]["text"]
 
         # sends message to slack
-        post(
+        requests.post(
             api_url, data=dumps(message),
             headers={'Content-Type': 'application/json'}
         )
@@ -127,7 +128,7 @@ def send_notification(users, post) -> None:
 
             # Create json link with message
             data = {'chat_id': user, 'text': message, 'parse_mode': 'HTML'}
-            post(api_url, data)
+            requests.post(api_url, data)
 
 
 # writes found post to the results.log file
@@ -209,17 +210,15 @@ def post_found(post, subreddit, who_to_notify) -> None:
     message = create_result_output(post, subreddit)
     print(message)
 
-    if not DEBUGGING:
-        send_notification(who_to_notify, post)
-        output_result_to_database(subreddit, post)
-        output_result_to_log(message, post.permalink)
+    # if not DEBUGGING:
+    send_notification(who_to_notify, post)
+    output_result_to_database(subreddit, post)
+    output_result_to_log(message, post.permalink)
 
 
 def process_post(post, subreddit):
     number_of_filters = len(CONFIG["search"][subreddit]["filters"])
-    queue = multiprocessing.Queue()
-
-    print(post.title)
+    queue = Queue()
 
     print("number of filters processed:", number_of_filters)
 
@@ -233,7 +232,7 @@ def process_post(post, subreddit):
         ret = deepcopy(return_vals)
         queue.put(ret)
 
-        process = multiprocessing.Process(
+        process = Process(
             target=filter_post,
             args=(post, CONFIG["search"][subreddit]["filters"][filter_index], queue)
         )
@@ -274,6 +273,8 @@ def main() -> None:
     for subreddit in subreddit_names:
         last_submission_created[str(subreddit)] = time.time()
 
+    times_list = []
+
     while True:
         for subreddit in subreddit_names:
             # stores most recent post time of this batch of posts
@@ -288,11 +289,24 @@ def main() -> None:
                 if post.created_utc > most_recent_post_time:
                     most_recent_post_time = post.created_utc
 
-                # checks the time the post was created vs the most recent logged time to ensure
-                # posts are not filtered multiple times
                 if post.created_utc > last_submission_created[str(subreddit)]:
+                    start = time.time()
+
+                    print(post.title)
+
                     last_submission_created[str(subreddit)] = post.created_utc
                     process_post(post, subreddit)
+
+                    num = time.time() - start
+                    times_list.append(num)
+
+                    total_time = 0
+                    for filter_time in times_list:
+                        total_time += filter_time
+
+                    print("time to apply all", subreddit, "filters to the post:", num, "seconds")
+                    print("new average time:", total_time / len(times_list))
+                    print(" ")
 
             time.sleep(1.1)
 
