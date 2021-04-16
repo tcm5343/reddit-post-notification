@@ -1,5 +1,5 @@
 import pytest, datetime
-import redditPostNotification as r
+import reddit_post_notification as r
 from types import SimpleNamespace
 
 # to run the tests, simply type `pytest` in the directory
@@ -56,3 +56,5 @@ def test_createResultOutput(post, subreddit, expected_result, getTimeStamp):
     p = SimpleNamespace(**post)
     expected_result = getTimeStamp + expected_result
     assert r.createResultOutput(p, subreddit) == expected_result
+
+

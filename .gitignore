@@ -1,7 +1,11 @@
 config.json
 config_test.json
+
 __pycache__/*
 .pytest_cache/*
+.env/*
+venv/*
+.idea/*
+
 *.db
 *.log
-.env/*

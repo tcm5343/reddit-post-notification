@@ -1,26 +1,30 @@
 #!/usr/bin/python3
 
-import time, multiprocessing
+import time
+import multiprocessing
 from json import load, dumps
 from sqlite3 import connect, Error
 from copy import deepcopy
-from requests import post
 from datetime import datetime
 
 import praw
 
-# if True, disables writing results to the db, the notification being sent, and uses config_test.json
-debugging = True
+# if True
+# - disables writing results to the db
+# - the notification being sent
+# - uses config_test.json
+DEBUGGING = True
 
 def importConfig() -> dict:
-    config_file_name = "config.json" if not debugging else "config_test.json"
+    config_file_name = "config.json" if not DEBUGGING else "config_test.json"
     try:
         file = open(config_file_name)
         config = load(file)
         file.close()
         return config
     except FileNotFoundError as e:
-        simpleErrorMessage = f"Error: {config_file_name} is not found, create it based on the example_config.json"
+        simpleErrorMessage = f"Error: {config_file_name} is not found, \
+            create it based on the example_config.json"
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
     except ValueError as e:
@@ -32,16 +36,19 @@ def importConfig() -> dict:
         outputErrorToLog(simpleErrorMessage, e)
         quit() # terminates program
 
+
 # connect to database
 def connectToDatabase() -> None:
     global con, cur
     con = connect('results.db')
     cur = con.cursor()
 
+
 # closes the connection to the database
 def closeDatabase() -> None:
     con.commit()
     con.close()
+
 
 # creates a sqlite3 database
 def createDatabase() -> None:
@@ -56,20 +63,25 @@ def createDatabase() -> None:
 
     closeDatabase()
 
+
 # writes results to sqlite3 database
 def outputResultToDatabase(subreddit, post):
     connectToDatabase()
-    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)', (None, datetime.now(), subreddit, post.title, post.permalink))
+    cur.execute('INSERT INTO results VALUES (?,?,?,?,?)',
+        (None, datetime.now(), subreddit, post.title, post.permalink))
     closeDatabase()
+
 
 # returns a time stamp for the logs
 def getTimeStamp(now) -> str:
     return now.strftime("%m-%d-%Y %I:%M:%S %p")
 
+
 # creates string to be output to the log and console
 def createResultOutput(post, subreddit) -> str:
     message = getTimeStamp(datetime.now()) + " - " + subreddit + " - " + post.title
     return message
+
 
 # creates payload and sends post request to the notification app
 def sendNotification(users, post, notification_app) -> None:
@@ -93,8 +105,9 @@ def sendNotification(users, post, notification_app) -> None:
         }
 
         # adds users to be notified of post to message
-        if (formatted_users != ""):
-            message["blocks"][0]["text"]["text"] = formatted_users + message["blocks"][0]["text"]["text"]
+        if formatted_users != "":
+            message["blocks"][0]["text"]["text"] = \
+                formatted_users + message["blocks"][0]["text"]["text"]
 
         # sends message to slack
         response = post(
@@ -103,7 +116,8 @@ def sendNotification(users, post, notification_app) -> None:
         )
     elif notification_app == "telegram":
         for user in users:
-            api_url = f'https://api.telegram.org/bot{ str(config["notifications"]["telegram"]["token"]) }/sendMessage'
+            api_url = f'https://api.telegram.org/bot' \
+                      f'{ str(config["notifications"]["telegram"]["token"]) }/sendMessage'
 
             message = f'<a href="https://reddit.com{post.permalink}">{post.title}</a>'
 
@@ -113,11 +127,13 @@ def sendNotification(users, post, notification_app) -> None:
             # POST the message
             post(api_url, data)
 
+
 # writes found post to the results.log file
 def outputResultToLog(message, url) -> None:
     f = open("results.log", "a")
     f.write(message + " (" + url + ")\n")
     f.close()
+
 
 # writes found post to the errors.log file
 def outputErrorToLog(message, error=None) -> None:
@@ -126,13 +142,15 @@ def outputErrorToLog(message, error=None) -> None:
     f.write( getTimeStamp(datetime.now()) + ": " + message + "\n" + str(error) + "\n\n")
     f.close()
 
+
 # reads a filter to determine who to notify
 def determineWhoToNotify(filter) -> list:
-    result = []    
-    if (filter.get("notify")):
+    result = []
+    if filter.get("notify"):
         for user in list(filter["notify"]):
             result.append(user)
     return result
+
 
 # determines if a string contains every word in a list of strings
 # not case-sensitive
@@ -143,8 +161,9 @@ def stringContainsEveryElementInList(keywordList, string) -> bool:
     else: # list is not empty
         for keyword in list([x.lower() for x in keywordList]):
             if keyword not in string.lower():
-                    inList = False
+                inList = False
     return inList
+
 
 # determines if a string contains at least one word in a list of strings
 # not case-sensitive
@@ -152,7 +171,7 @@ def stringContainsAnElementInList(keywordList, string) -> bool:
     inList = False # default
     for keyword in list([x.lower() for x in keywordList]):
         if keyword in string.lower():
-                return True
+            return True
     return inList
 
 
@@ -162,12 +181,12 @@ def filter_post(post, subreddit, filter, q):
     exceptFlag = True
     includesFlag = False
 
-    if (filter.get("includes")):
+    if filter.get("includes"):
         includesFlag = stringContainsEveryElementInList(filter["includes"], post.title)
-    else: 
+    else:
         includesFlag = True
 
-    if (filter.get("except")):
+    if filter.get("except"):
         exceptFlag = stringContainsAnElementInList(filter["except"], post.title)
     else:
         exceptFlag = False
@@ -187,7 +206,7 @@ def post_found(post, subreddit, who_to_notify) -> None:
     message = createResultOutput(post, subreddit)
     print(message) # shows notification in the console
 
-    if not debugging:
+    if not DEBUGGING:
         sendNotification(who_to_notify, post, notification_app) # sends notification to slack
         outputResultToDatabase(subreddit, post)
         outputResultToLog(message, post.permalink) # writes to log file
@@ -216,13 +235,13 @@ def main() -> None:
 
     times_list = []
 
-    while (True):
+    while True:
         for subreddit in subredditNames:
             mostRecentPostTime = 0 # stores most recent post time of this batch of posts
 
             # returns new posts from subreddit
             subredditObj = reddit.subreddit(subreddit).new(limit = 5)
-            
+
             for post in subredditObj:
 
                 # updates the time of the most recently filtered post
@@ -231,7 +250,7 @@ def main() -> None:
 
                 # checks the time the post was created vs the most recent logged time to ensure
                 # posts are not filtered multiple times
-                if ( post.created_utc > lastSubmissionCreated[str(subreddit)] ):
+                if post.created_utc > lastSubmissionCreated[str(subreddit)]:
                     start = time.time()
 
                     print("post found")
@@ -246,19 +265,19 @@ def main() -> None:
                             "notify": False,
                             "who_to_notify": set()
                         }
-                    
-                    # creates and starts a process for applying each filter for a subreddit on a post
+
                     for filterIndex in range(numberOfFilters):
                         ret = deepcopy(return_vals)
                         queue.put(ret)
 
-                        p = multiprocessing.Process( 
-                            target=filter_post, 
-                            args=(post, subreddit, config["search"][subreddit]["filters"][filterIndex], queue)
+                        p = multiprocessing.Process(
+                            target=filter_post,
+                            args=(post, subreddit,
+                            config["search"][subreddit]["filters"][filterIndex], queue)
                         )
-                        
+
                         processes.append(p)
-                        processes[filterIndex].start()               
+                        processes[filterIndex].start()
 
                     # when a process is finished, a record is pulled off the queue and processed
                     for p in processes:
@@ -274,11 +293,11 @@ def main() -> None:
 
                     num = time.time() - start
                     times_list.append(num)
-                    
+
                     sum = 0
-                    for n in times_list:
-                        sum = sum + n
-                        
+                    for filter_time in times_list:
+                        sum = sum + filter_time
+
                     print("time to apply all", subreddit, "filters to the post:", num, "seconds")
                     print("new average time:", sum / len(times_list))
                     print(" ")
@@ -290,11 +309,11 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except Error as e: # sqlite3 error
-        outputErrorToLog(" ", e)
+    except Error as error: # sqlite3 error
+        outputErrorToLog(" ", error)
         time.sleep(5)
         main()
-    except Exception as e:
-        outputErrorToLog(" ", e)
+    except Exception as error:
+        outputErrorToLog(" ", error)
         time.sleep(5)
         main()
