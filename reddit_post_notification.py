@@ -210,10 +210,10 @@ def post_found(post, subreddit, who_to_notify) -> None:
     message = create_result_output(post, subreddit)
     print(message)
 
-    # if not DEBUGGING:
-    send_notification(who_to_notify, post)
-    output_result_to_database(subreddit, post)
-    output_result_to_log(message, post.permalink)
+    if not DEBUGGING:
+        send_notification(who_to_notify, post)
+        output_result_to_database(subreddit, post)
+        output_result_to_log(message, post.permalink)
 
 
 def process_post(post, subreddit):
