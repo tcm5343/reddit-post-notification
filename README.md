@@ -68,7 +68,7 @@ TODO: Add instructions on building config
 ### If a post triggers multiple filters in a subreddit, will notifications be sent correctly?
 - Yes, all filters within a subreddit are processed against a post title at the same time using multiprocessing. If whomever is set to be notified is on one or more of the filters which would trigger a notification, they will recieve one notification for the post.
 
-# Speed:
+# Speed
 Although this program is not resource heavy, the post processing time is correlated to what hardware it is running on. For the test, each subreddit has 100 filters and each of them contain the includes, excludes, and notify sections.
 
 - **4-15-2021** - The average time taken from filtering 250 different posts is 0.283 seconds. (using Process)
