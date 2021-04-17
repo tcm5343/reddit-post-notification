@@ -69,12 +69,10 @@ TODO: Add instructions on building config
 - Yes, all filters within a subreddit are processed against a post title at the same time using multiprocessing. If whomever is set to be notified is on one or more of the filters which would trigger a notification, they will recieve one notification for the post.
 
 # Speed:
-Although this program is not resource heavy, the post processing
-time is correlated to what hardware it is running on. All 100 of the filters
-being applied to a post contain the includes, excludes, and notify sections.
+Although this program is not resource heavy, the post processing time is correlated to what hardware it is running on. For the test, each subreddit has 100 filters and each of them contain the includes, excludes, and notify sections.
 
-- **4-15-2021** - The average time taken from filtering 250 different posts is 0.283 seconds.
-- **4-16-2021** - The average time taken from filtering 100 different posts is 0.034 seconds. 
+- **4-15-2021** - The average time taken from filtering 250 different posts is 0.283 seconds. (using Process)
+- **4-16-2021** - The average time taken from filtering 100 different posts is 0.034 seconds. (using Thread)
 
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
