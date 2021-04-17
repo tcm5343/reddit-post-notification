@@ -73,7 +73,8 @@ Although this program is not resource heavy, the post processing
 time is correlated to what hardware it is running on. All 100 of the filters
 being applied to a post contain the includes, excludes, and notify sections.
 
-- **4-16-2021** - The average time taken from filtering 250 different posts is 0.283 seconds. 
+- **4-15-2021** - The average time taken from filtering 250 different posts is 0.283 seconds.
+- **4-16-2021** - The average time taken from filtering 100 different posts is 0.034 seconds. 
 
 # Resource Usage
 Below is a screenshot of the resource usage of this application while running on Ubuntu Server 20.04.1 on a Raspberry Pi.
