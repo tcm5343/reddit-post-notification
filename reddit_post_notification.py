@@ -5,7 +5,6 @@ from multiprocessing import Queue
 
 from json import load, dumps
 from copy import deepcopy
-from datetime import datetime
 from sys import exit
 
 import time
@@ -73,18 +72,18 @@ def create_database() -> None:
 def output_result_to_database(subreddit, post):
     connect_to_database()
     CUR.execute('INSERT INTO results VALUES (?,?,?,?,?)',
-                (None, datetime.now(), subreddit, post.title, post.permalink))
+                (None, time.time(), subreddit, post.title, post.permalink))
     close_database()
 
 
 # returns a time stamp for the logs
 def get_time_stamp(now) -> str:
-    return now.strftime("%m-%d-%Y %I:%M:%S %p")
+    return time.strftime("%m-%d-%Y %I:%M:%S %p", time.localtime(now))
 
 
 # creates string to be output to the log and console
 def create_result_output(post, subreddit) -> str:
-    message = get_time_stamp(datetime.now()) + " - " + subreddit + " - " + post.title
+    message = get_time_stamp(time.time()) + " - " + subreddit + " - " + post.title
     return message
 
 
@@ -142,7 +141,7 @@ def output_result_to_log(message, url) -> None:
 def output_error_to_log(message, error_message=None) -> None:
     print(message + "\n" + str(error_message))
     file = open("errors.log", "a")
-    file.write(get_time_stamp(datetime.now()) + ": " + message + "\n" + str(error_message) + "\n\n")
+    file.write(get_time_stamp(time.time()) + ": " + message + "\n" + str(error_message) + "\n\n")
     file.close()
 
 
@@ -222,7 +221,7 @@ def process_post(post, subreddit):
 
     print("number of filters processed:", number_of_filters)
 
-    processes = []
+    threads = []
     return_vals = {
         "notify": False,
         "who_to_notify": set()
@@ -232,17 +231,17 @@ def process_post(post, subreddit):
         ret = deepcopy(return_vals)
         queue.put(ret)
 
-        process = Thread(
+        thread = Thread(
             target=filter_post,
             args=(post, CONFIG["search"][subreddit]["filters"][filter_index], queue)
         )
 
-        processes.append(process)
-        processes[filter_index].start()
+        threads.append(thread)
+        threads[filter_index].start()
 
-    # when a process is finished, a record is pulled off the queue and processed
-    for process in processes:
-        process.join()
+    # when a thread is finished, a record is pulled off the queue and processed
+    for thread in threads:
+        thread.join()
         ret = queue.get()
 
         if ret["notify"]:
