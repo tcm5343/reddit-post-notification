@@ -1,13 +1,14 @@
 #!/usr/bin/python3
-
+import sys
 from threading import Thread
 from multiprocessing import Queue
 
 from json import load, dumps
 from copy import deepcopy
 from sys import exit
+from datetime import datetime
 
-import time
+from time import time, strftime, localtime, sleep
 import sqlite3
 import requests
 
@@ -17,7 +18,7 @@ import praw
 # - disables writing results to the db
 # - disables the notification being sent
 # - uses config_test.json
-DEBUGGING = False
+DEBUGGING = True
 
 CONFIG, NOTIFICATION_APP, CON, CUR = dict(), str(), None, None
 
@@ -72,18 +73,23 @@ def create_database() -> None:
 def output_result_to_database(subreddit, post):
     connect_to_database()
     CUR.execute('INSERT INTO results VALUES (?,?,?,?,?)',
-                (None, time.time(), subreddit, post.title, post.permalink))
+                (None, time(), subreddit, post.title, post.permalink))
     close_database()
 
 
 # returns a time stamp for the logs
 def get_time_stamp(now) -> str:
-    return time.strftime("%m-%d-%Y %I:%M:%S %p", time.localtime(now))
+    if isinstance(now, datetime):
+        result = now.strftime("%m-%d-%Y %I:%M:%S %p")
+    elif isinstance(now, float):
+        result = strftime("%m-%d-%Y %I:%M:%S %p", localtime(now))
+
+    return result
 
 
 # creates string to be output to the log and console
-def create_result_output(post, subreddit) -> str:
-    message = get_time_stamp(time.time()) + " - " + subreddit + " - " + post.title
+def create_result_output(post, subreddit, timestamp=datetime.now()) -> str:
+    message = get_time_stamp(timestamp) + " - " + subreddit + " - " + post.title
     return message
 
 
@@ -141,7 +147,7 @@ def output_result_to_log(message, url) -> None:
 def output_error_to_log(message, error_message=None) -> None:
     print(message + "\n" + str(error_message))
     file = open("errors.log", "a")
-    file.write(get_time_stamp(time.time()) + ": " + message + "\n" + str(error_message) + "\n\n")
+    file.write(get_time_stamp(time()) + ": " + message + "\n" + str(error_message) + "\n\n")
     file.close()
 
 
@@ -156,7 +162,7 @@ def determine_who_to_notify(single_filter) -> list:
 
 # determines if a string contains every word in a list of strings
 # not case-sensitive
-def string_contains_every_element_in_list(keyword_list, string) -> bool:
+def string_contains_every_element_in_list(keyword_list: list, string: str) -> bool:
     in_list = True
     # if list is empty
     if not keyword_list:
@@ -170,7 +176,7 @@ def string_contains_every_element_in_list(keyword_list, string) -> bool:
 
 # determines if a string contains at least one word in a list of strings
 # not case-sensitive
-def string_contains_an_element_in_list(keyword_list, string) -> bool:
+def string_contains_an_element_in_list(keyword_list: list, string: str) -> bool:
     in_list = False
     for keyword in [x.lower() for x in keyword_list]:
         if keyword in string.lower():
@@ -178,26 +184,44 @@ def string_contains_an_element_in_list(keyword_list, string) -> bool:
     return in_list
 
 
-def filter_post(post, single_filter, queue):
+def parse_title_for_have(post_title: str):
+    return post_title[post_title.find("[h]") + 3:post_title.find("w") - 1]
+
+
+def parse_title_for_want(post_title: str):
+    return post_title[post_title.find("[w]") + 3:]
+
+
+def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
+    try:
+        result = {
+            "includes": string_contains_every_element_in_list(val, title),
+            "excludes": not string_contains_an_element_in_list(val, title),
+            "have": string_contains_every_element_in_list(val, parse_title_for_have(title)),
+            "want": string_contains_every_element_in_list(val, parse_title_for_want(title)),
+            "notify": True,
+        }[attribute]
+    except KeyError:
+        print("The config includes unsupported attributes")
+        sys.exit()
+
+    return result
+
+
+def filter_post(post, single_filter: dict, queue):
     # default flag initializations
     result = False
-    except_flag = True
-    includes_flag = False
+    post_title = post.title.lower()
 
-    if single_filter.get("includes"):
-        includes_flag = string_contains_every_element_in_list(single_filter["includes"], post.title)
-    else:
-        includes_flag = True
+    results_list = []
 
-    if single_filter.get("except"):
-        except_flag = string_contains_an_element_in_list(single_filter["except"], post.title)
-    else:
-        except_flag = False
+    for key, value in single_filter.items():
+        results_list.append(handle_filter_attributes(key, post_title, value))
 
     queue_dict = queue.get()
 
     # if condition passes, a result has been found
-    if includes_flag and not except_flag:
+    if False not in results_list:
         result = True
         queue_dict["who_to_notify"] = determine_who_to_notify(single_filter)
 
@@ -206,13 +230,15 @@ def filter_post(post, single_filter, queue):
 
 
 def post_found(post, subreddit, who_to_notify) -> None:
-    message = create_result_output(post, subreddit)
+    message = create_result_output(post, subreddit, datetime.now())
     print(message)
 
     if not DEBUGGING:
         send_notification(who_to_notify, post)
         output_result_to_database(subreddit, post)
         output_result_to_log(message, post.permalink)
+    else:
+        print("post passed filters")
 
 
 def process_post(post, subreddit):
@@ -270,7 +296,7 @@ def main() -> None:
     # store the time the last submission checked was created in unix time per subreddit
     last_submission_created = {}
     for subreddit in subreddit_names:
-        last_submission_created[str(subreddit)] = time.time()
+        last_submission_created[str(subreddit)] = time()
 
     number_of_posts = 0
     total_time = 0
@@ -290,12 +316,12 @@ def main() -> None:
                     most_recent_post_time = post.created_utc
 
                 if post.created_utc > last_submission_created[str(subreddit)]:
-                    start = time.time()
+                    start = time()
 
                     last_submission_created[str(subreddit)] = post.created_utc
                     process_post(post, subreddit)
 
-                    total_time += time.time() - start
+                    total_time += time() - start
                     number_of_posts += 1
 
                     # print("time to apply all", subreddit, "filters to the post:", num, "seconds")
@@ -303,7 +329,7 @@ def main() -> None:
                           "post(s):", total_time / number_of_posts)
                     print(" ")
 
-            time.sleep(1.1)
+            sleep(1.1)
 
 
 if __name__ == "__main__":
@@ -311,9 +337,9 @@ if __name__ == "__main__":
         main()
     except sqlite3.Error as error: # sqlite3 error
         output_error_to_log(" ", error)
-        time.sleep(5)
+        sleep(5)
         main()
     except Exception as error:
         output_error_to_log(" ", error)
-        time.sleep(5)
+        sleep(5)
         main()
