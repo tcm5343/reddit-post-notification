@@ -221,7 +221,7 @@ def filter_post(post, single_filter: dict, queue):
 
     queue_dict = queue.get()
 
-    # if condition passes, a result has been found
+    # if a result has been found
     if False not in results_list:
         result = True
         queue_dict["who_to_notify"] = determine_who_to_notify(single_filter)
