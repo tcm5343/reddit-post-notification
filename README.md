@@ -76,7 +76,7 @@ Although this program is not resource heavy, the post's processing time is corre
 
 After this point, the `have` and `want` attributes were added into the test.
 - **4-24-2021** - The average time from filtering 50 different posts is .0387 seconds. (using Thread and refactored filter attribute handling)
-- **4-24-2021** - The average time from filtering 50 different posts is **** seconds. (Using Threads handling the filters attributes in a simple way)
+- **4-24-2021** - The average time from filtering 50 different posts is .035 seconds. (Using Threads handling the filters attributes in a simple way)
 
 
 # Resource Usage

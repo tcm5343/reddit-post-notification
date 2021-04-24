@@ -78,7 +78,7 @@ def output_result_to_database(subreddit, post):
 
 
 # returns a time stamp for the logs
-def get_time_stamp(now) -> str:
+def get_time_stamp(now=datetime.now()) -> str:
     if isinstance(now, datetime):
         result = now.strftime("%m-%d-%Y %I:%M:%S %p")
     elif isinstance(now, float):
@@ -152,7 +152,7 @@ def output_error_to_log(message, error_message=None) -> None:
 
 
 # reads a filter to determine who to notify
-def determine_who_to_notify(single_filter) -> list:
+def determine_who_to_notify(single_filter: dict) -> list:
     result = []
     if single_filter.get("notify"):
         for user in list(single_filter["notify"]):
@@ -185,10 +185,12 @@ def string_contains_an_element_in_list(keyword_list: list, string: str) -> bool:
 
 
 def parse_title_for_have(post_title: str):
-    return post_title[post_title.find("[h]") + 3:post_title.find("w") - 1]
+    post_title = post_title.lower()
+    return post_title[post_title.find("[h]") + 3:post_title.find("[w]")]
 
 
 def parse_title_for_want(post_title: str):
+    post_title = post_title.lower()
     return post_title[post_title.find("[w]") + 3:]
 
 
@@ -211,6 +213,7 @@ def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
 def filter_post(post, single_filter: dict, queue):
     # default flag initializations
     result = False
+    print(post.title)
     post_title = post.title.lower()
 
     results_list = []
