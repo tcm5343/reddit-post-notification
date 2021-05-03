@@ -34,4 +34,4 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
-          python3 src/reddit_post_notification.py debug "$REDDIT_CLIENT_ID" "$REDDIT_CLIENT_SECRET" telegram "$TELEGRAM_TOKEN"
+          python3 reddit_post_notification.py debug "$REDDIT_CLIENT_ID" "$REDDIT_CLIENT_SECRET" telegram "$TELEGRAM_TOKEN"
