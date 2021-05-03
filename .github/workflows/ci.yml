@@ -26,3 +26,12 @@ jobs:
         run: pytest
       - name: Run pylint
         run: pylint --rcfile=.pylintrc reddit_post_notification.py
+      - name: E2E tests (telegram)
+        shell: bash
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          python3 src/reddit_post_notification.py debug "$REDDIT_CLIENT_ID" "$REDDIT_CLIENT_SECRET" telegram "$TELEGRAM_TOKEN"
