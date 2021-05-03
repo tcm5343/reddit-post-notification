@@ -78,7 +78,7 @@ def output_result_to_database(subreddit, post):
 
 
 # returns a time stamp for the logs
-def get_time_stamp(now) -> str:
+def get_time_stamp(now=datetime.now()) -> str:
     if isinstance(now, datetime):
         result = now.strftime("%m-%d-%Y %I:%M:%S %p")
     elif isinstance(now, float):
@@ -152,7 +152,7 @@ def output_error_to_log(message, error_message=None) -> None:
 
 
 # reads a filter to determine who to notify
-def determine_who_to_notify(single_filter) -> list:
+def determine_who_to_notify(single_filter: dict) -> list:
     result = []
     if single_filter.get("notify"):
         for user in list(single_filter["notify"]):
@@ -185,16 +185,18 @@ def string_contains_an_element_in_list(keyword_list: list, string: str) -> bool:
 
 
 def parse_title_for_have(post_title: str):
-    return post_title[post_title.find("[h]") + 3:post_title.find("w") - 1]
+    post_title = post_title.lower()
+    return post_title[post_title.find("[h]") + 3:post_title.find("[w]")]
 
 
 def parse_title_for_want(post_title: str):
+    post_title = post_title.lower()
     return post_title[post_title.find("[w]") + 3:]
 
 
 def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
     try:
-        result = {
+        return {
             "includes": string_contains_every_element_in_list(val, title),
             "excludes": not string_contains_an_element_in_list(val, title),
             "have": string_contains_every_element_in_list(val, parse_title_for_have(title)),
@@ -205,12 +207,11 @@ def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
         print("The config includes unsupported attributes")
         sys.exit()
 
-    return result
-
 
 def filter_post(post, single_filter: dict, queue):
     # default flag initializations
     result = False
+    print(post.title)
     post_title = post.title.lower()
 
     results_list = []
@@ -220,7 +221,7 @@ def filter_post(post, single_filter: dict, queue):
 
     queue_dict = queue.get()
 
-    # if condition passes, a result has been found
+    # if a result has been found
     if False not in results_list:
         result = True
         queue_dict["who_to_notify"] = determine_who_to_notify(single_filter)

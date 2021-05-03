@@ -1,5 +1,5 @@
 # reddit-post-notification
-A program which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria. Depending on how many subreddits you are checking, a subreddit is queried at most once per second as per Reddit's API rules.
+A program that you can self host which will alert a user of of posts which are made in a specific subreddit if it matches specific search criteria. Depending on how many subreddits you are checking, a subreddit is queried at most once per second as per Reddit's API rules.
 
 If this program works and saves you some money or time, consider sending me some BTC at `bc1qmqnmr8hwj2lcp2ccfg95k0378urfxtm80k7fu0` or my PayPal below.
 
@@ -76,7 +76,7 @@ Although this program is not resource heavy, the post's processing time is corre
 
 After this point, the `have` and `want` attributes were added into the test.
 - **4-24-2021** - The average time from filtering 50 different posts is .0387 seconds. (using Thread and refactored filter attribute handling)
-- **4-24-2021** - The average time from filtering 50 different posts is **** seconds. (Using Threads handling the filters attributes in a simple way)
+- **4-24-2021** - The average time from filtering 50 different posts is .035 seconds. (Using Threads handling the filters attributes in a simple way)
 
 
 # Resource Usage
