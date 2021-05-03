@@ -1,8 +1,8 @@
 import sqlite3
 from textwrap import dedent
 
-class sqlite3_database(object):
 
+class SQL3Database(object):
     def __init__(self, database='database.db'):
         self.database = database
         self.connection = None
