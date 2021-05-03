@@ -31,7 +31,7 @@ def import_config():
     if DEBUGGING:
         config_file_name = "config_test.json"
     elif E2E:
-        config_file_name = ".github/config_e2e.json"
+        config_file_name = "../.github/config_e2e.json"
     else:
         config_file_name = "config.json"
     try:
@@ -272,21 +272,20 @@ def main() -> None:
     global CONFIG, NOTIFICATION_APP
     check_if_debugging()
 
-
     CONFIG = import_config()
     NOTIFICATION_APP = str(CONFIG["notifications"]["app"])
 
     # overwrite secrets for tests
     # reddit_client_id, reddit_client_secret, notification_app, notification_app_token
-    if len(sys.argv) == 5:
+    if len(sys.argv) == 6:
         args = sys.argv[2:]
         CONFIG["reddit"]["clientId"] = args[0]
         CONFIG["reddit"]["clientSecret"] = args[1]
         NOTIFICATION_APP = args[2]
         if NOTIFICATION_APP == "telegram":
-            CONFIG["notifications"]["telegram"]["token"] = args[4]
+            CONFIG["notifications"]["telegram"]["token"] = args[3]
         elif NOTIFICATION_APP:
-            CONFIG["notifications"]["slack"]["webhook-url"] = args[4]
+            CONFIG["notifications"]["slack"]["webhook-url"] = args[3]
 
     DB.create_database()
 
@@ -309,7 +308,7 @@ def main() -> None:
     looping = True
     while looping:
         for subreddit in subreddit_names:
-            if DEBUGGING:
+            if DEBUGGING or E2E:
                 print("Processing", subreddit)
             # stores most recent post time of this batch of posts
             most_recent_post_time = 0
@@ -337,7 +336,7 @@ def main() -> None:
                           "post(s):", total_time / number_of_posts)
                     print(" ")
 
-                    if DEBUGGING:
+                    if DEBUGGING or E2E:
                         print(post.title)
                         looping = False
             sleep(1)
