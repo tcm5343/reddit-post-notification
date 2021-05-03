@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from unittest import mock
 
-import src.reddit_post_notification as r
+import reddit_post_notification as r
 
 # to run the tests, simply type `pytest` in the directory
 

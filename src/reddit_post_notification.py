@@ -13,7 +13,7 @@ import sqlite3
 import requests
 import praw
 
-from src.SQL3Database import SQL3Database
+from SQL3Database import SQL3Database
 
 # if True
 # - disables writing results to the db
