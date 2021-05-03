@@ -161,12 +161,12 @@ def string_contains_an_element_in_list(keyword_list: list, string: str) -> bool:
     return in_list
 
 
-def parse_title_for_have(post_title: str):
+def parse_title_for_have(post_title: str) -> str:
     post_title = post_title.lower()
     return post_title[post_title.find("[h]") + 3:post_title.find("[w]")]
 
 
-def parse_title_for_want(post_title: str):
+def parse_title_for_want(post_title: str) -> str:
     post_title = post_title.lower()
     return post_title[post_title.find("[w]") + 3:]
 
@@ -308,7 +308,7 @@ def main() -> None:
     looping = True
     while looping:
         for subreddit in subreddit_names:
-            if DEBUGGING or E2E:
+            if DEBUGGING:
                 print("Processing", subreddit)
             # stores most recent post time of this batch of posts
             most_recent_post_time = 0
