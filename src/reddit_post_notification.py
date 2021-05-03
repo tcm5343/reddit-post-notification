@@ -31,7 +31,7 @@ def import_config():
     if DEBUGGING:
         config_file_name = "config_test.json"
     elif E2E:
-        config_file_name = "../.github/config_e2e.json"
+        config_file_name = "config_e2e.json"
     else:
         config_file_name = "config.json"
     try:
