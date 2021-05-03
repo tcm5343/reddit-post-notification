@@ -7,7 +7,7 @@ ENV TZ=America/New_York
 WORKDIR /usr/src/app
 
 # copy the required files to the working directory
-COPY redditPostNotification.py .
+COPY src/redditPostNotification.py .
 COPY config.json .
 COPY requirements.txt .
 

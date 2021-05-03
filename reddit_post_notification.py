@@ -1,26 +1,31 @@
 #!/usr/bin/python3
 import sys
+
 from threading import Thread
 from multiprocessing import Queue
-
 from json import load, dumps
 from copy import deepcopy
-from sys import exit
+from sys import exit, argv
 from datetime import datetime
-
 from time import time, strftime, localtime, sleep
+
 import sqlite3
 import requests
-
 import praw
+
+from SQL3Database import SQL3Database
+
+
 
 # if True
 # - disables writing results to the db
 # - disables the notification being sent
 # - uses config_test.json
-DEBUGGING = True
-
-CONFIG, NOTIFICATION_APP, CON, CUR = dict(), str(), None, None
+# - only processes a single post
+DEBUGGING = False
+CONFIG = dict()
+NOTIFICATION_APP = str()
+DB = SQL3Database("results.db")
 
 
 def import_config():
@@ -43,38 +48,6 @@ def import_config():
         simple_error_message = "Error: Unhandled exception with regard to importing config"
         output_error_to_log(simple_error_message, import_error)
         exit()
-
-
-def connect_to_database():
-    global CON, CUR
-    CON = sqlite3.connect('results.db')
-    CUR = CON.cursor()
-
-
-def close_database() -> None:
-    CON.commit()
-    CON.close()
-
-
-# creates a sqlite3 database
-def create_database() -> None:
-    connect_to_database()
-    CUR.execute('''CREATE TABLE if not exists results (
-        id integer not null primary key,
-        date_time text,
-        subreddit text,
-        post_title text,
-        post_url text)''')
-
-    close_database()
-
-
-# writes results to sqlite3 database
-def output_result_to_database(subreddit, post):
-    connect_to_database()
-    CUR.execute('INSERT INTO results VALUES (?,?,?,?,?)',
-                (None, time(), subreddit, post.title, post.permalink))
-    close_database()
 
 
 # returns a time stamp for the logs
@@ -204,14 +177,13 @@ def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
             "notify": True,
         }[attribute]
     except KeyError:
-        print("The config includes unsupported attributes")
+        print("The config includes unsupported attributes:", attribute)
         sys.exit()
 
 
 def filter_post(post, single_filter: dict, queue):
     # default flag initializations
     result = False
-    print(post.title)
     post_title = post.title.lower()
 
     results_list = []
@@ -236,7 +208,7 @@ def post_found(post, subreddit, who_to_notify) -> None:
 
     if not DEBUGGING:
         send_notification(who_to_notify, post)
-        output_result_to_database(subreddit, post)
+        DB.insert_result(time(), subreddit, post.title, post.permalink)
         output_result_to_log(message, post.permalink)
     else:
         print("post passed filters")
@@ -279,12 +251,35 @@ def process_post(post, subreddit):
         post_found(post, subreddit, list(return_vals["who_to_notify"]))
 
 
+def check_if_debugging():
+    global DEBUGGING
+    for arg in argv:
+        if arg == "debug":
+            DEBUGGING = True
+            break
+
+
 def main() -> None:
     global CONFIG, NOTIFICATION_APP
+    check_if_debugging()
+    print("Debugging Mode:", DEBUGGING)
+
     CONFIG = import_config()
     NOTIFICATION_APP = str(CONFIG["notifications"]["app"])
 
-    create_database()
+    # overwrite secrets for tests
+    # reddit_client_id, reddit_client_secret, notification_app, notification_app_token
+    if len(sys.argv) == 5:
+        args = sys.argv[2:]
+        CONFIG["reddit"]["clientId"] = args[0]
+        CONFIG["reddit"]["clientSecret"] = args[1]
+        NOTIFICATION_APP = args[2]
+        if NOTIFICATION_APP == "telegram":
+            CONFIG["notifications"]["telegram"]["token"] = args[4]
+        elif NOTIFICATION_APP:
+            CONFIG["notifications"]["slack"]["webhook-url"] = args[4]
+
+    DB.create_database()
 
     # access to reddit api
     reddit = praw.Reddit(client_id=CONFIG["reddit"]["clientId"],
@@ -302,8 +297,11 @@ def main() -> None:
     number_of_posts = 0
     total_time = 0
 
-    while True:
+    looping = True
+    while looping:
         for subreddit in subreddit_names:
+            if DEBUGGING:
+                print("Processing", subreddit)
             # stores most recent post time of this batch of posts
             most_recent_post_time = 0
 
@@ -330,13 +328,16 @@ def main() -> None:
                           "post(s):", total_time / number_of_posts)
                     print(" ")
 
-            sleep(1.1)
+                    if DEBUGGING:
+                        print(post.title)
+                        looping = False
+            sleep(1)
 
 
 if __name__ == "__main__":
     try:
         main()
-    except sqlite3.Error as error: # sqlite3 error
+    except sqlite3.Error as error:  # sqlite3 error
         output_error_to_log(" ", error)
         sleep(5)
         main()
