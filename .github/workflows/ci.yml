@@ -25,7 +25,7 @@ jobs:
       - name: Run unit tests with pytest
         run: pytest
       - name: Run pylint
-        run: pylint --rcfile=.pylintrc reddit_post_notification.py
+        run: pylint --rcfile=.pylintrc src/reddit_post_notification.py
       - name: E2E tests (telegram)
         shell: bash
         env:
