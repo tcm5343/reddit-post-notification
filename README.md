@@ -19,7 +19,7 @@ If this program works and saves you some money or time, consider sending me some
           * if you want to be mentioned in the notification, add your slack id in the filters you would like to be mentioned in
 4. Navigate to your home directory and clone the repo
       * `cd ~`
-      * `git clone https://github.com/tcm5343/RedditPostNotification.git`
+      * `git clone https://github.com/tcm5343/reddit-post-notification.git`
       * `cd reddit-post-notification`
 5. Create `config.json` to store the credentials (refer to `example_config.json`) and place it in RedditPostNotification/
 6. Modify the `config.json` to include subreddits and keyword filters which you want to be notified about
