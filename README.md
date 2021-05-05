@@ -26,7 +26,7 @@ If this program works and saves you some money or time, consider sending me some
 7. Run the script
      * Using Docker (Docker must be installed)
           * `sudo docker build -t "redditpostnotification" ./`
-          * `sudo docker run --restart unless-stopped --name redditapp -v ~/RedditPostNotification:/usr/src/app -d redditpostnotification`
+          * `sudo docker run --restart unless-stopped --name redditapp -v ~/reddit-post-notification:/usr/src/app -d redditpostnotification`
      * Traditionaly
           * Windows
                * `pip install praw` (https://praw.readthedocs.io/en/latest/)
@@ -85,5 +85,5 @@ Below is a screenshot of the resource usage of this application while running on
 ![Image of Usage](https://i.ibb.co/VxJVVtC/Screen-Shot-2021-04-11-at-9-50-08-PM.png)
 
 # Dev
-A pylintrc is already created and any pull requests must pass completely. To run pylint locally execute `pylint --rcfile=.pylintrc reddit_post_notification.py
+A pylintrc is already created and any pull requests must pass completely. To run pylint locally execute `pylint --rcfile=.pylintrc src/reddit_post_notification.py
 `
