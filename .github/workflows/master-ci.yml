@@ -30,4 +30,6 @@ jobs:
         run: coverage report --fail-under=10  # todo increase
 
       - name: Run pylint
-        run: pylint ./tests ./src
+        run: |
+          export PYTHONPATH='./src/'
+          pylint ./tests ./src
