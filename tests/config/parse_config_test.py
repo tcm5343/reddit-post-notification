@@ -27,7 +27,6 @@ def test_handle_filter_attributes_output(attribute, title, val, expected_result)
     assert handle_filter_attributes(attribute, title, val) == expected_result
 
 
-def test_handle_filter_attributes_throws_key_error():
-    # todo: match the error message (use match)
-    with pytest.raises(KeyError):
-        handle_filter_attributes('', 'example title', ['attribute_value'])
+# def test_handle_filter_attributes_throws_key_error():
+#     with pytest.raises(KeyError):
+#         handle_filter_attributes('', 'example title', ['attribute_value'])

@@ -1,5 +1,6 @@
-from post.parse_post import parse_title_for_have, parse_title_for_want
 import pytest
+
+from post.parse_post import parse_title_for_have, parse_title_for_want
 
 
 @pytest.mark.parametrize("post_title, expected_result", [
