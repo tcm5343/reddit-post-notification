@@ -21,4 +21,4 @@ def handle_filter_attributes(attribute: str, title: str, val: list) -> bool:
             "notify": True,
         }[attribute]
     except KeyError as err:
-        raise KeyError("The config includes unsupported attributes:", attribute, '\n', err)
+        raise KeyError("The config includes unsupported attributes:", attribute, '\n', err) from err
