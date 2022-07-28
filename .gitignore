@@ -1,4 +1,8 @@
-config.json
-.pytest_cache/*
 .coverage
+
+config.json
+
+.idea/*
+.pytest_cache/*
+
 venv/*
