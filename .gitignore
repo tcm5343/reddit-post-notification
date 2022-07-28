@@ -2,7 +2,8 @@
 
 config.json
 
-.idea/*
-.pytest_cache/*
+.idea/
+.pytest_cache/
+*/__pycache__/
 
-venv/*
+venv/
