@@ -27,7 +27,7 @@ jobs:
           pytest --cov=./src ./tests
 
       - name: Run coverage
-        run: coverage report --fail-under=10  # todo pump this rookie number up
+        run: coverage report --fail-under=10  # todo increase
 
       - name: Run pylint
         run: pylint ./tests ./src
