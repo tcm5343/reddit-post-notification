@@ -2,7 +2,10 @@ name: Unit Tests
 on:
   pull_request:
     branches:
-      - master
+      - *
+  push:
+    branches:
+      - *
 
 jobs:
   build:
@@ -27,4 +30,4 @@ jobs:
         run: coverage report --fail-under=50  # todo pump this rookie number up
 
       - name: Run pylint
-        run: pylint --rcfile=.pylintrc src/reddit_post_notification.py
+        run: pylint ./tests ./src
