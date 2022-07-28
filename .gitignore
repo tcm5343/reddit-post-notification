@@ -1,16 +1,4 @@
 config.json
-config_test.json
-
-src/__pycache__/*
-__pycache__/*
 .pytest_cache/*
-.env/*
-.idea/*
-
+.coverage
 venv/*
-
-.DS_Store
-._config_test.json
-
-*.db
-*.log
