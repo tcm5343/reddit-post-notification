@@ -4,6 +4,9 @@ on:
     branches:
       - '*'
 
+env:
+  PYTHONPATH: ./src/
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,14 +25,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run unit tests
-        run: |
-          export PYTHONPATH='./src/'
-          pytest --cov=./src ./tests
+        run: pytest --cov=./src ./tests
 
       - name: Run coverage
         run: coverage report --fail-under=10  # todo increase
 
       - name: Run pylint
-        run: |
-          export PYTHONPATH='./src/'
-          pylint ./tests ./src
+        run: pylint ./tests ./src
