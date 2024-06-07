@@ -10,9 +10,11 @@ def main():
     config = import_config('./config.json')
 
     reddit = praw.Reddit(
+        username=config["reddit"]["username"],
+        password=config["reddit"]["password"],
         client_id=config["reddit"]["clientId"],
         client_secret=config["reddit"]["clientSecret"],
-        user_agent="default"
+        user_agent="default",
     )
 
     subreddit_names = list(config["search"].keys())

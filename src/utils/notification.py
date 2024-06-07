@@ -49,7 +49,7 @@ def __send_notification_to_telegram(
         message = f'<a href="https://reddit.com{post.permalink}">{post.title}</a>'
 
         # Create json link with message
-        data = {'chat_id': user, 'text': message, 'parse_mode': 'HTML'}
+        data = {'chat_id': user, 'text': message, 'parse_mode': 'HTML', "disable_web_page_preview": True}
         requests.post(api_url, data)
 
 
