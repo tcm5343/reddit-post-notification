@@ -1,25 +1,38 @@
-FROM ubuntu:latest
-
-RUN apt-get update -y && apt-get upgrade -y
-
-ENV TZ=America/New_York
+FROM python:3.12
 
 WORKDIR /usr/src/app
 
-# copy the required files to the working directory
-COPY src/redditPostNotification.py .
-COPY config.json .
-COPY requirements.txt .
+ENV PYTHONPATH=/usr/src/app/src
+ENV PYTHONUNBUFFERED=1
 
-# install python3 and pip
-RUN apt-get install python3 -y
-RUN apt-get install python3-pip -y
-RUN python3 -m pip install --upgrade pip
+COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# install required packages
-RUN pip3 install -r requirements.txt
+CMD [ "python", "./src/reddit_post_notification/reddit_post_notification.py" ]
 
-# install sqlite3
-RUN apt-get install sqlite3 -y
+# FROM ubuntu:24.10
 
-CMD [ "python3", "reddit_post_notification.py" ]
+# RUN apt-get update -y
+# RUN apt-get install sqlite3 -y
+
+#WORKDIR /usr/src/app
+#ENV PYTHONPATH=/usr/src/app/src
+#
+#ENV TZ=America/New_York
+#ENV PYTHONUNBUFFERED=1
+#
+#COPY src ./src
+#COPY config.json .
+#COPY requirements.txt .
+#
+## python3
+#RUN apt-get install python3 -y
+#RUN apt-get install python3-pip -y
+#RUN apt-get install python3.12-venv -y
+#
+#RUN python3 -m venv .venv
+## RUN python3 -m pip install --upgrade pip
+#
+#RUN .venv/bin/pip3 install -r requirements.txt
+#
+#CMD [ ".venv/bin/python3", "src/reddit_post_notification/reddit_post_notification.py" ]

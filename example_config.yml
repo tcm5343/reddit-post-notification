@@ -1,0 +1,41 @@
+creds:
+  notifiers:
+    telegram:
+      token: *
+  reddit:
+    client_id: *
+    client_secret: *
+    password: *
+    username: *
+
+who:
+  telegram:
+    john: 1580989241
+
+filters:
+  filter1:
+    title:
+      includes:
+  filter2:
+    title:
+      includes:
+        - wts
+        - umlindi
+      excludes: []
+      regex: []
+    body:
+    post:
+    url:
+    have:
+    want:
+    notify:
+      telegram:
+        - john  # is resolved to the value of who -> telegram -> tom in code
+
+search:
+  universal:  # this filter is applied to all subreddits defined
+    - filter1
+  subreddits:
+    subreddit_name1:
+      - filter2
+    subreddit_name2:
