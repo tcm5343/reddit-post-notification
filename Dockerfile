@@ -6,6 +6,9 @@ ENV PYTHONPATH=/usr/src/app/src
 ENV PYTHONUNBUFFERED=1
 
 COPY . .
+RUN chmod +x do/lint.sh
+RUN chmod +x do/test.sh
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "./src/reddit_post_notification/reddit_post_notification.py" ]

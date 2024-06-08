@@ -6,8 +6,8 @@ from submission_filter.submission_filter import SubmissionFilter
 from submission_filter import submission_filter
 
 
-@pytest.fixture(autouse=True)
-def mock_submission():
+@pytest.fixture(autouse=True, name='mock_submission')
+def f_mock_submission():
     with patch.object(submission_filter, 'Submission') as mock:
         yield mock
 

@@ -1,35 +1,38 @@
 version: '3'
 
-# dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
-
 tasks:
+  default:
+    cmds:
+      - task --list
+
   build:
     desc: build the container
     cmds:
-      - docker build --progress=plain -t "redditpostnotification" ./
+      - docker build --tag redditpostnotification .
     sources:
       - src/**/**
       - requirements*.txt
       - config.yml
       - Dockerfile
       - Taskfile.yml
+      - do/**/**
+      - .pylintrc
+      - .coveragerc
 
   run:
-    desc: run the script in the container
+    desc: start program in the container
     deps: [build]
     cmds:
       - docker run redditpostnotification
 
-#  test:
-#    desc: run the unit tests
-#    deps: [build]
-#    cmds:
-#      - go test -v ./...
-#
-#  lint:
-#    desc: Runs golangci-lint
-#    sources:
-#      - './**/*.go'
-#      - .golangci.yml
-#    cmds:
-#      - golangci-lint run
+  test:
+    desc: run tests in the container and report coverage
+    deps: [build]
+    cmds:
+      - docker run --entrypoint '/bin/sh' redditpostnotification -c "./do/test.sh"
+
+  lint:
+    desc: lint the codebase
+    deps: [build]
+    cmds:
+      - docker run --entrypoint '/bin/sh' redditpostnotification -c "./do/lint.sh"

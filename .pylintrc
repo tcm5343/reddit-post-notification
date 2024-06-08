@@ -1,7 +1,9 @@
 [default]
 disable=
     missing-module-docstring,
-    missing-function-docstring
+    missing-function-docstring,
+    missing-class-docstring,
+    fixme
 
 [FORMAT]
-max-line-length=240
+max-line-length=120

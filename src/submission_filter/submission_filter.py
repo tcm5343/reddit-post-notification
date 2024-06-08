@@ -3,6 +3,7 @@ import re
 from praw.models import Submission
 
 
+# pylint: disable=too-few-public-methods
 class SubmissionFilter:
     def __init__(self, filter_name, filter_def):
         self.name = filter_name
@@ -10,17 +11,17 @@ class SubmissionFilter:
         self.notify_def = filter_def.get("notify", {})
 
     def __eval_includes(self, part, target_string: str):
-        if all([substring in target_string for substring in self.filter_parts[part].get('includes', [])]):
+        if all(substring in target_string for substring in self.filter_parts[part].get('includes', [])):
             return True
         return False
 
     def __eval_excludes(self, part, target_string: str):
-        if any([substring in target_string for substring in self.filter_parts[part].get('excludes', [])]):
+        if any(substring in target_string for substring in self.filter_parts[part].get('excludes', [])):
             return False
         return True
 
     def __eval_regex(self, part, target_string: str):
-        if all([re.search(pattern, target_string) for pattern in self.filter_parts[part].get('regex', [])]):
+        if all(re.search(pattern, target_string) for pattern in self.filter_parts[part].get('regex', [])):
             return True
         return False
 
@@ -41,7 +42,7 @@ class SubmissionFilter:
             'post': post.title + " " + post.selftext,  # post is defined as both title and body
             'url': post.url,
         }
-        for key, value in self.filter_parts.items():
+        for key in self.filter_parts:
             if key != 'notify':
                 target_string = string_parts[key]
                 includes = self.__eval_includes(key, target_string)
