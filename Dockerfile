@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED=1
 
 COPY . .
 RUN chmod +x do/lint.sh
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "./src/reddit_post_notification/reddit_post_notification.py" ]
