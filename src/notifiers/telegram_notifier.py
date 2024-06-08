@@ -2,6 +2,7 @@ import requests
 from praw.models import Submission
 
 
+# pylint: disable=too-few-public-methods
 class TelegramNotifier:
     def __init__(self, token):
         self.service = 'telegram'
@@ -18,4 +19,4 @@ class TelegramNotifier:
 
     def send(self, post: Submission, users: list[str]):
         for user in users:
-            requests.post(self.api_url, self.__format_payload(post, user))
+            requests.post(self.api_url, self.__format_payload(post, user), timeout=15)

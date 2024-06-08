@@ -16,6 +16,7 @@ class Config:
         filter_def = self.config.get('filters', {}).get(filter_name)
         if filter_def:
             return SubmissionFilter(filter_name, filter_def)
+        return None
 
     def get_filter_def_by_names(self, filter_names: list[str]) -> List[SubmissionFilter]:
         if filter_names:
@@ -37,7 +38,7 @@ class Config:
         return []
 
     def __read_config(self, path: str):
-        with open(path) as config_file:
+        with open(path, encoding='utf-8') as config_file:
             self.config = yaml.safe_load(config_file)
 
     def get_subreddits(self):
@@ -49,6 +50,7 @@ class Config:
         """
         if self.config.get('search') and self.config['search'].get('subreddits'):
             return list(self.config['search']['subreddits'].keys())
+        return None
 
     def __get_user_ids(self, service, aliases):
         service_user_ids = self.config.get('who').get(service)
@@ -68,6 +70,7 @@ class Config:
         if self.config.get('search') and self.config['search'].get('subreddits'):
             filter_names = self.config['search']['subreddits'].get(subreddit)
             return self.get_filter_def_by_names(filter_names) + self.__get_universal_filters()
+        return []
 
     def notify(self, notify_def, submission: Submission):
         for service, user_aliases in notify_def.items():
