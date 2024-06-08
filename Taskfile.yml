@@ -8,7 +8,7 @@ tasks:
   build:
     desc: build the container
     cmds:
-      - docker build --tag "redditpostnotification" ./
+      - docker build --tag redditpostnotification .
     sources:
       - src/**/**
       - requirements*.txt
