@@ -1,6 +1,6 @@
 .coverage
 
-config.json
+config.yml
 
 .idea/
 .pytest_cache/

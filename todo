@@ -1,4 +1,0 @@
-1. Confirm the limit a user can hit the reddit api. Determine the number of subreddits in the config and calculate how
-long to wait to optimize the number of requests that can be made. Make requests in parallel?
-2. Get the docker container working again, use docker compose instead?
-3. Write more/better unit tests

@@ -1,23 +1,23 @@
 from time import time, sleep
 
-import praw
+from praw import Reddit
 
-from config.config import import_config
 from post.process_post import process_submission
+from config.config import Config
 
 
 def main():
-    config = import_config('./config.json')
+    config = Config('./config.yml')
 
-    reddit = praw.Reddit(
-        username=config["reddit"]["username"],
-        password=config["reddit"]["password"],
-        client_id=config["reddit"]["clientId"],
-        client_secret=config["reddit"]["clientSecret"],
+    reddit = Reddit(
+        username=config.config['creds']["reddit"]["username"],
+        password=config.config['creds']["reddit"]["password"],
+        client_id=config.config['creds']["reddit"]["client_id"],
+        client_secret=config.config['creds']["reddit"]["client_secret"],
         user_agent="default",
     )
 
-    subreddit_names = list(config["search"].keys())
+    subreddit_names = config.get_subreddits()
     last_post_scanned = {str(subreddit_name): time() for subreddit_name in subreddit_names}
     number_of_posts = 0
     total_time = 0

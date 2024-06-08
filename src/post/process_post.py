@@ -1,63 +1,41 @@
 from copy import deepcopy
-from datetime import datetime
 from multiprocessing import Queue
 from threading import Thread
 
 from praw.models import Submission
 
-from config.parse_config import determine_who_to_notify, handle_filter_attributes
-from utils.logging import create_post_found_console_message
-from utils.notification import send_notification
+from config.config import Config
+from submission_filter.submission_filter import SubmissionFilter
 
 
-def __filter_post(post: Submission, specific_filter: dict, queue: Queue):
-    # default flag initializations
-    result = False
-    post_title = post.title.lower()
-
-    results_list = []
-
-    for key, value in specific_filter.items():
-        results_list.append(handle_filter_attributes(key, post_title, value))
-
+def __filter_post(post: Submission, submission_filter: SubmissionFilter, queue: Queue):
     queue_dict = queue.get()
-
-    # if a result has been found
-    if False not in results_list:
-        result = True
-        queue_dict["who_to_notify"] = determine_who_to_notify(specific_filter)
-
-    queue_dict["notify"] = result
+    queue_dict["notify"] = submission_filter.eval(post)
+    if queue_dict["notify"]:
+        queue_dict["notify_def"] = submission_filter.notify_def
     queue.put(queue_dict)
 
 
-def __post_found(post, subreddit: str, who_to_notify: list, notification_config: dict) -> None:
-    print(create_post_found_console_message(post.title, subreddit, datetime.now()))
-    send_notification(who_to_notify, post, notification_config)
-
-
-def process_submission(submission: Submission, subreddit_name: str, config: dict):
-    number_of_filters = len(config["search"][subreddit_name]["filters"])
+def process_submission(submission: Submission, subreddit_name: str, config: Config):
     queue = Queue()
-    print("number of filters processed:", number_of_filters)
+    submission_filters = config.get_filters(subreddit_name)
 
     threads = []
     return_vals = {
         "notify": False,
-        "who_to_notify": set()
+        "notify_def": {}
     }
 
-    for filter_index in range(number_of_filters):
+    for i, submission_filter in enumerate(submission_filters):
         ret = deepcopy(return_vals)
         queue.put(ret)
 
         thread = Thread(
             target=__filter_post,
-            args=(submission, config["search"][subreddit_name]["filters"][filter_index], queue)
+            args=(submission, submission_filter, queue)
         )
-
         threads.append(thread)
-        threads[filter_index].start()
+        threads[i].start()
 
     # when a thread is finished, a record is pulled off the queue and processed
     for thread in threads:
@@ -66,9 +44,13 @@ def process_submission(submission: Submission, subreddit_name: str, config: dict
 
         if ret["notify"]:
             return_vals["notify"] = True
-            return_vals["who_to_notify"].update(set(ret["who_to_notify"]))
+            for service in ret["notify_def"]:
+                return_vals["notify_def"][service] = (
+                        return_vals["notify_def"].get(service, []) + ret["notify_def"][service]
+                )
 
     if return_vals["notify"]:
-        notification_config = config["notifications"]
-        __post_found(submission, subreddit_name, list(return_vals["who_to_notify"]),
-                     notification_config)
+        return_vals["notify_def"] = {
+            service: list(set(who_to_notify)) for service, who_to_notify in return_vals['notify_def'].items()
+        }
+        config.notify(return_vals["notify_def"], submission)

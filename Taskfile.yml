@@ -10,7 +10,7 @@ tasks:
     sources:
       - src/**/**
       - requirements*.txt
-      - config.json
+      - config.yml
       - Dockerfile
       - Taskfile.yml
 
