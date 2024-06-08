@@ -1,7 +1,5 @@
 version: '3'
 
-# dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
-
 tasks:
   build:
     desc: build the container
@@ -27,7 +25,7 @@ tasks:
     desc: run tests in the container
     deps: [build]
     cmds:
-      - docker run --entrypoint '/bin/sh' redditpostnotification -c "pytest"
+      - docker run --entrypoint '/bin/sh' redditpostnotification -c "./do/test.sh"
 
   lint:
     desc: run lint script
