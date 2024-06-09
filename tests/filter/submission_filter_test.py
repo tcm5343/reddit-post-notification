@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
 
@@ -120,3 +120,18 @@ def test_one_part_matching_evals_true(mock_submission):
     mock_submission.selftext = "some body"
 
     assert SubmissionFilter('some-filter', filter_def).eval(mock_submission) is True
+
+
+def test_string_parts_are_lazily_evaluated(mock_submission):
+    selftext_mock = PropertyMock()
+    type(mock_submission).selftext = selftext_mock
+    url_mock = PropertyMock()
+    type(mock_submission).url = url_mock
+    title_mock = PropertyMock()
+    type(mock_submission).title = title_mock
+
+    SubmissionFilter('some-filter', {}).eval(mock_submission)
+
+    selftext_mock.assert_not_called()
+    url_mock.assert_not_called()
+    title_mock.assert_called_once()

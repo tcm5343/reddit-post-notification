@@ -47,17 +47,17 @@ class SubmissionFilter:
             2. If any part is truthy, a message is sent
         """
         lowered_title = post.title.lower()
-        string_parts = {  # todo: lazily evaluate this
-            'have': post.title[lowered_title.find("[h]") + 3:lowered_title.find("[w]")],
-            'want': post.title[lowered_title.find("[w]") + 3:],
-            'title': post.title,
-            'body': post.selftext,
-            'post': post.title + " " + post.selftext,  # post is defined as both title and body
-            'url': post.url,
+        string_parts = {
+            'have': lambda: post.title[lowered_title.find("[h]") + 3:lowered_title.find("[w]")],
+            'want': lambda: post.title[lowered_title.find("[w]") + 3:],
+            'title': lambda: post.title,
+            'body': lambda: post.selftext,
+            'post': lambda: post.title + " " + post.selftext,  # post is defined as both title and body
+            'url': lambda: post.url,
         }
         for key in self.filters:
             if key != 'notify':
-                target_string = string_parts[key]
+                target_string = string_parts[key]()
                 includes = self.__eval_includes(key, target_string)
                 excludes = self.__eval_excludes(key, target_string)
                 regex = self.__eval_regex(key, target_string)
