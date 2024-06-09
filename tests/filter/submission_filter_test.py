@@ -23,7 +23,7 @@ def f_mock_submission():
 def test_regex(test_title, test_filter, expected, mock_submission):
     filter_def = {
         'title': {
-            'regex': test_filter
+            'regex': [test_filter]
         }
     }
     sub_filter = SubmissionFilter('some-filter', filter_def)
@@ -41,7 +41,7 @@ def test_regex(test_title, test_filter, expected, mock_submission):
 def test_includes(test_title, test_filter, expected, mock_submission):
     filter_def = {
         'title': {
-            'includes': test_filter
+            'includes': [test_filter]
         }
     }
     sub_filter = SubmissionFilter('some-filter', filter_def)
@@ -59,7 +59,7 @@ def test_includes(test_title, test_filter, expected, mock_submission):
 def test_excludes(test_title, test_filter, expected, mock_submission):
     filter_def = {
         'title': {
-            'excludes': test_filter
+            'excludes': [test_filter]
         }
     }
     sub_filter = SubmissionFilter('some-filter', filter_def)
@@ -70,8 +70,8 @@ def test_excludes(test_title, test_filter, expected, mock_submission):
 def test_only_one_filter_passing_is_false(mock_submission):
     filter_def = {
         'title': {
-            'includes': ['some'],
-            'excludes': ['title']
+            'includes': [['some']],
+            'excludes': [['title']]
         }
     }
     sub_filter = SubmissionFilter('some-filter', filter_def)
@@ -97,7 +97,7 @@ def test_only_one_filter_passing_is_false(mock_submission):
 def test_all_parts_of_post(post_part, test_filter, expected, mock_submission):
     filter_def = {
         post_part: {
-            'includes': test_filter
+            'includes': [test_filter]
         }
     }
     mock_submission.title = "[h] something [w] else"
@@ -110,10 +110,10 @@ def test_all_parts_of_post(post_part, test_filter, expected, mock_submission):
 def test_one_part_matching_evals_true(mock_submission):
     filter_def = {
         "title": {  # doesn't match
-            'includes': "xyz"
+            'includes': [["xyz"]]
         },
         "body": {  # matches
-            'includes': "some body"
+            'includes': [["some body"]]
         }
     }
     mock_submission.title = "some title"
