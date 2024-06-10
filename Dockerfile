@@ -6,8 +6,7 @@ ENV PYTHONPATH=/usr/src/app/src
 ENV PYTHONUNBUFFERED=1
 
 COPY . .
-RUN chmod +x do/lint.sh
-RUN chmod +x do/test.sh
+RUN chmod +x do/lint.sh do/test.sh
 
 RUN pip install --no-cache-dir -r requirements.txt
 
