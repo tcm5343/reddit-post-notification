@@ -49,44 +49,28 @@ def test_includes(test_title, test_filter, expected, mock_submission):
     assert sub_filter.eval(mock_submission) == expected
 
 
-# todo: parameterize these
-def test_includes_defaults_to_true_if_undefined(mock_submission):
+@pytest.mark.parametrize('rule', [
+    'includes',
+    'excludes',
+    'regex',
+])
+def test_rule_defaults_to_true_if_undefined(rule, mock_submission):
     filter_def = {
         'title': {
+            'includes': [['title']],
             'excludes': [['excludeme']],
             'regex': [['.*']]
         }
     }
-    sub_filter = SubmissionFilter('some-filter', filter_def)
+    del filter_def['title'][rule]
     mock_submission.title = 'some test title'
+
+    sub_filter = SubmissionFilter('some-filter', filter_def)
+
     assert sub_filter.eval(mock_submission) is True
 
 
-def test_excludes_defaults_to_true_if_undefined(mock_submission):
-    filter_def = {
-        'title': {
-            'includes': [['title']],
-            'regex': [['.*']]
-        }
-    }
-    sub_filter = SubmissionFilter('some-filter', filter_def)
-    mock_submission.title = 'some test title'
-    assert sub_filter.eval(mock_submission) is True
-
-
-def test_regex_defaults_to_true_if_undefined(mock_submission):
-    filter_def = {
-        'title': {
-            'includes': [['title']],
-            'excludes': [['excludeme']]
-        }
-    }
-    sub_filter = SubmissionFilter('some-filter', filter_def)
-    mock_submission.title = 'some test title'
-    assert sub_filter.eval(mock_submission) is True
-
-
-def test_no_filters_returns_false(mock_submission):
+def test_empty_filter_def_returns_false(mock_submission):
     assert SubmissionFilter('some-filter', {}).eval(mock_submission) is False
 
 

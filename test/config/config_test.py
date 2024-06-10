@@ -1,4 +1,4 @@
-from unittest.mock import patch, PropertyMock, mock_open
+from unittest.mock import patch, mock_open
 
 import pytest
 
@@ -24,9 +24,9 @@ def f_mock_telegram_notifier():
         yield mock
 
 
-@pytest.fixture(autouse=True, name='mock_open')
-def f_mock_open():
-    data = """
+@pytest.fixture(name='mocked_config_data')
+def f_mocked_config_data():
+    yield """
     creds:
         notifiers:
             telegram:
@@ -60,11 +60,15 @@ def f_mock_open():
       subreddits:
         subreddit1:
           - filter1
-    """
-    with patch('builtins.open', mock_open(read_data=data)) as mock:
+"""
+
+
+@pytest.fixture(autouse=True, name='mock_open')
+def f_mock_open(mocked_config_data):
+    with patch('builtins.open', mock_open(read_data=mocked_config_data)) as mock:
         yield mock
 
 
 def test_config():
-    config = Config('some/path')
+    _config = Config('some/path')
     assert True
