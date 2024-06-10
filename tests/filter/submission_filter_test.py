@@ -12,13 +12,13 @@ def f_mock_submission():
         yield mock
 
 
-@pytest.mark.parametrize("test_title, test_filter, expected", [
-    ("abc", ["^abc$"], True),
-    # ("abc", ["b"], True),
-    # ("abc", [".*"], True),
-    # ("abc", [""], True),
-    # ("abc", ["^abcd$"], False),
-    # ("", ["d"], False),
+@pytest.mark.parametrize('test_title, test_filter, expected', [
+    ('abc', ['^abc$'], True),
+    ('abc', ['b'], True),
+    ('abc', ['.*'], True),
+    ('abc', [''], True),
+    ('abc', ['^abcd$'], False),
+    ('', ['d'], False),
 ])
 def test_regex(test_title, test_filter, expected, mock_submission):
     filter_def = {
@@ -31,12 +31,12 @@ def test_regex(test_title, test_filter, expected, mock_submission):
     assert sub_filter.eval(mock_submission) == expected
 
 
-@pytest.mark.parametrize("test_title, test_filter, expected", [
-    ("abc", ["abc"], True),
-    ("abc", ["b"], True),
-    ("abc", [""], True),
-    ("abc", ["d"], False),
-    ("", ["d"], False),
+@pytest.mark.parametrize('test_title, test_filter, expected', [
+    ('abc', ['abc'], True),
+    ('abc', ['b'], True),
+    ('abc', [''], True),
+    ('abc', ['d'], False),
+    ('', ['d'], False),
 ])
 def test_includes(test_title, test_filter, expected, mock_submission):
     filter_def = {
@@ -49,6 +49,7 @@ def test_includes(test_title, test_filter, expected, mock_submission):
     assert sub_filter.eval(mock_submission) == expected
 
 
+# todo: parameterize these
 def test_includes_defaults_to_true_if_undefined(mock_submission):
     filter_def = {
         'title': {
@@ -111,12 +112,12 @@ def test_invalid_parts_of_post_are_skipped_from_filtering(mock_submission):
     assert sub_filter is False
 
 
-@pytest.mark.parametrize("test_title, test_filter, expected", [
-    ("abc", ["abc"], False),
-    ("abc", ["b"], False),
-    ("abc", [''], False),
-    ("abc", ["d"], True),
-    ("", ["d"], True),
+@pytest.mark.parametrize('test_title, test_filter, expected', [
+    ('abc', ['abc'], False),
+    ('abc', ['b'], False),
+    ('abc', [''], False),
+    ('abc', ['d'], True),
+    ('', ['d'], True),
 ])
 def test_excludes(test_title, test_filter, expected, mock_submission):
     filter_def = {
@@ -137,24 +138,24 @@ def test_only_one_filter_passing_is_false(mock_submission):
         }
     }
     sub_filter = SubmissionFilter('some-filter', filter_def)
-    mock_submission.title = "some title"
+    mock_submission.title = 'some title'
     assert sub_filter.eval(mock_submission) is False
 
 
-@pytest.mark.parametrize("post_part, test_filter, expected", [
-    ("have", ["something"], True),
-    ("have", ["else"], False),
-    ("want", ["else"], True),
-    ("want", ["something"], False),
-    ("title", ['[h] something [w] else'], True),
-    ("title", ['some text of'], False),
-    ("body", ["some text of"], True),
-    ("body", ["[h] something [w]"], False),
-    ("post", ["some text of"], True),
-    ("post", ["[h] something [w] else"], True),
-    ("post", ["test.xyz"], False),
-    ("url", ["test.xyz"], True),
-    ("url", ["something.com"], False),
+@pytest.mark.parametrize('post_part, test_filter, expected', [
+    ('have', ['something'], True),
+    ('have', ['else'], False),
+    ('want', ['else'], True),
+    ('want', ['something'], False),
+    ('title', ['[h] something [w] else'], True),
+    ('title', ['some text of'], False),
+    ('body', ['some text of'], True),
+    ('body', ['[h] something [w]'], False),
+    ('post', ['some text of'], True),
+    ('post', ['[h] something [w] else'], True),
+    ('post', ['test.xyz'], False),
+    ('url', ['test.xyz'], True),
+    ('url', ['something.com'], False),
 ])
 def test_all_parts_of_post(post_part, test_filter, expected, mock_submission):
     filter_def = {
@@ -162,8 +163,8 @@ def test_all_parts_of_post(post_part, test_filter, expected, mock_submission):
             'includes': [test_filter]
         }
     }
-    mock_submission.title = "[h] something [w] else"
-    mock_submission.selftext = "some text of the post"
+    mock_submission.title = '[h] something [w] else'
+    mock_submission.selftext = 'some text of the post'
     mock_submission.url = 'test.xyz/some/page.html?id=1'
 
     assert SubmissionFilter('some-filter', filter_def).eval(mock_submission) == expected
@@ -171,15 +172,15 @@ def test_all_parts_of_post(post_part, test_filter, expected, mock_submission):
 
 def test_one_part_matching_evals_true(mock_submission):
     filter_def = {
-        "title": {  # doesn't match
-            'includes': [["xyz"]]
+        'title': {  # doesn't match
+            'includes': [['xyz']]
         },
-        "body": {  # matches
-            'includes': [["some body"]]
+        'body': {  # matches
+            'includes': [['some body']]
         }
     }
-    mock_submission.title = "some title"
-    mock_submission.selftext = "some body"
+    mock_submission.title = 'some title'
+    mock_submission.selftext = 'some body'
 
     assert SubmissionFilter('some-filter', filter_def).eval(mock_submission) is True
 

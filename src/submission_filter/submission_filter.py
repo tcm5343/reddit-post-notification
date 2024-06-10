@@ -8,7 +8,7 @@ class SubmissionFilter:
     def __init__(self, filter_name, filter_def):
         self.name = filter_name
         self.filters = filter_def
-        self.notify_def = filter_def.get("notify", {})
+        self.notify_def = filter_def.get('notify', {})
         self.valid_filter_rules = ['includes', 'excludes', 'regex']
         self.valid_part_of_post = ['title', 'body', 'have', 'want', 'post', 'url']
 
@@ -56,11 +56,11 @@ class SubmissionFilter:
 
         lowered_title = post.title.lower()
         string_parts = {
-            'have': lambda: post.title[lowered_title.find("[h]") + 3:lowered_title.find("[w]")],
-            'want': lambda: post.title[lowered_title.find("[w]") + 3:],
+            'have': lambda: post.title[lowered_title.find('[h]') + 3:lowered_title.find('[w]')],
+            'want': lambda: post.title[lowered_title.find('[w]') + 3:],
             'title': lambda: post.title,
             'body': lambda: post.selftext,
-            'post': lambda: post.title + " " + post.selftext,  # post is defined as both title and body
+            'post': lambda: post.title + ' ' + post.selftext,  # post is defined as both title and body
             'url': lambda: post.url,
         }
         for part_of_post in self.filters:
