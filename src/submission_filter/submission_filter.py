@@ -9,6 +9,8 @@ class SubmissionFilter:
         self.name = filter_name
         self.filters = filter_def
         self.notify_def = filter_def.get("notify", {})
+        self.valid_filter_rules = ['includes', 'excludes', 'regex']
+        self.valid_part_of_post = ['title', 'body', 'have', 'want', 'post', 'url']
 
     def __eval_includes(self, part, target_string: str):
         checks = self.filters[part].get('includes', [])
@@ -20,6 +22,9 @@ class SubmissionFilter:
         return False
 
     def __eval_excludes(self, part, target_string: str):
+        """
+        returns truthy if every substring in a given check are not in the target_string for each check
+        """
         checks = self.filters[part].get('excludes', [])
         if not checks:
             return True
@@ -46,6 +51,9 @@ class SubmissionFilter:
                 for includes and exlcudes: all elements of a filter must be present in the target string
             2. If any part is truthy, a message is sent
         """
+        if not [part_of_post in self.valid_part_of_post for part_of_post in self.filters]:
+            return False
+
         lowered_title = post.title.lower()
         string_parts = {
             'have': lambda: post.title[lowered_title.find("[h]") + 3:lowered_title.find("[w]")],
@@ -55,12 +63,12 @@ class SubmissionFilter:
             'post': lambda: post.title + " " + post.selftext,  # post is defined as both title and body
             'url': lambda: post.url,
         }
-        for key in self.filters:
-            if key != 'notify':
-                target_string = string_parts[key]()
-                includes = self.__eval_includes(key, target_string)
-                excludes = self.__eval_excludes(key, target_string)
-                regex = self.__eval_regex(key, target_string)
+        for part_of_post in self.filters:
+            if part_of_post in self.valid_part_of_post:
+                target_string = string_parts[part_of_post]()
+                includes = self.__eval_includes(part_of_post, target_string)
+                excludes = self.__eval_excludes(part_of_post, target_string)
+                regex = self.__eval_regex(part_of_post, target_string)
                 if includes and excludes and regex:
                     return True
         return False
