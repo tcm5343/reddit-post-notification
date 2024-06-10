@@ -69,6 +69,6 @@ def f_mock_open(mocked_config_data):
         yield mock
 
 
-# def test_config():
-#     _config = Config('some/path')
-#     assert True
+def test_config():
+    _config = Config('some/path')
+    assert True
