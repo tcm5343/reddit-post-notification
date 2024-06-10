@@ -16,6 +16,9 @@ jobs:
         with:
           version: 3.34.1
 
+      - name: build
+        run: task build
+
       - name: lint
         run: task lint
 
