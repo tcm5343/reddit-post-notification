@@ -8,19 +8,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setup task
+      - name: Setup task
         uses: arduino/setup-task@v2
         with:
           version: 3.34.1
 
-      - name: build
+      - name: Build
         run: task build
 
-      - name: lint
+      - name: Lint
         run: task lint
 
-      - name: test
+      - name: Test
         run: task test
