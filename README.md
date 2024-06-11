@@ -27,6 +27,8 @@ sending me some value through BTC at `bc1qmqnmr8hwj2lcp2ccfg95k0378urfxtm80k7fu0
 # Running the Program
 TODO
 
+Task is used to assist in running the program. 
+
 # How to build the config file
 TODO
 

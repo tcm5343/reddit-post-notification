@@ -11,13 +11,13 @@ tasks:
       - docker build --tag redditpostnotification .
     sources:
       - src/**/**
-      - requirements*.txt
-      - config.yml
-      - Dockerfile
-      - Taskfile.yml
+      - test/**/**
       - do/**/**
-      - .pylintrc
-      - .coveragerc
+      - requirements*.txt
+      - .*rc
+      - Dockerfile
+      - config.yml
+      - Taskfile.yml
 
   run:
     desc: start program in the container
